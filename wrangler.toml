@@ -1,3 +1,17 @@
+$schema = "node_modules/wrangler/config-schema.json"
+main = "./.opennext/cloudflare/worker.js"
 name = "admin-dashboard"
 compatibility_date = "2025-12-17"
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = [
+  "nodejs_compat",
+  "global_fetch_strictly_public"
+]
+
+[assets]
+directory = "./.opennext/cloudflare/public"
+binding = "ASSETS"
+
+[services]
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "admin-dashboard"
