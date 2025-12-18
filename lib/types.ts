@@ -1,4 +1,21 @@
 // MongoDB Types (for reference - using demo data for preview)
+export interface Admin {
+  _id: string
+  name: string
+  email: string
+  phone: string
+  password: string
+  secretKey1: string
+  secretKey2: string
+  isVerified: boolean
+  verificationCode?: string
+  verificationExpires?: string
+  resetToken?: string
+  resetExpires?: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface User {
   _id: string
   name: string
