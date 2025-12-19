@@ -23,7 +23,7 @@ export interface User {
   password?: string
   status: "active" | "inactive" | "pending" | "suspended"
   subscription: {
-    plan: "Free" | "Basic" | "Pro" | "Enterprise"
+    plan: "Free" | "Pro"
     startDate: string
     endDate?: string
     status: "active" | "cancelled" | "expired"
