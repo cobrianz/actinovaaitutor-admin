@@ -21,6 +21,7 @@ export async function GET() {
     const dbPlans = await db.collection("plans").find({}).toArray()
 
     const plans = dbPlans.map(plan => ({
+      _id: plan._id.toString(),
       id: plan.id,
       name: plan.name,
       price: plan.price,

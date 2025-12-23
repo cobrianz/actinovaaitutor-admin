@@ -17,7 +17,7 @@ export function SubscriptionPlans() {
   const fetchPlans = async (silent = false) => {
     try {
       if (!silent) setLoading(true)
-      const response = await fetch("/api/billing/plans")
+      const response = await fetch("/api/billing/plans", { cache: "no-store" })
       const data = await response.json()
       if (data.plans) {
         setPlans(data.plans)
