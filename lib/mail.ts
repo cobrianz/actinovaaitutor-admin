@@ -81,19 +81,21 @@ export async function sendPasswordResetEmail(email: string, token: string, baseU
     }
 }
 
-export async function sendApprovalEmail(email: string, name: string) {
+export async function sendApprovalEmail(email: string, name: string, baseUrl: string) {
     if (!SMTP_USER || !SMTP_PASS) {
         console.warn("SMTP credentials not provided. Logging approval email.")
         console.log(`[Email Mock] Account approved for ${email}`)
         return
     }
 
+    const dashboardLink = `${baseUrl}/admin`
+
     try {
         await transporter.sendMail({
             from: SMTP_FROM,
             to: email,
             subject: "Your Admin Account Has Been Approved! 🎉",
-            text: `Welcome aboard, ${name}! Your account has been approved and you can now log in to the dashboard.`,
+            text: `Welcome aboard, ${name}! Your account has been approved and you can now log in to the dashboard at ${dashboardLink}`,
             html: `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); padding: 40px 20px; text-align: center;">
@@ -105,13 +107,13 @@ export async function sendApprovalEmail(email: string, name: string) {
                             Great news! Your administrator account for <strong>Actinova</strong> has been approved. You now have full access to the admin dashboard.
                         </p>
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="http://localhost:3000/admin" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);">
+                            <a href="${dashboardLink}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);">
                                 Access Dashboard
                             </a>
                         </div>
                         <p style="font-size: 14px; color: #888888; text-align: center;">
                              If the button doesn't work, copy this link:<br>
-                            <a href="http://localhost:3000/admin" style="color: #6366f1;">http://localhost:3000/admin</a>
+                            <a href="${dashboardLink}" style="color: #6366f1;">${dashboardLink}</a>
                         </p>
                     </div>
                     <div style="background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #9ca3af;">

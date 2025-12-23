@@ -79,7 +79,7 @@ export async function PUT(request: NextRequest) {
 
         // Send email if approving
         if (isApproved && !currentAdmin.isApproved) {
-            await sendApprovalEmail(currentAdmin.email, currentAdmin.name)
+            await sendApprovalEmail(currentAdmin.email, currentAdmin.name, request.nextUrl.origin)
         }
 
         return NextResponse.json({ message: "Admin updated successfully" })
