@@ -11,7 +11,7 @@ async function verifyAdmin(request: NextRequest) {
     if (!token) return null
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET)
+        const decoded = jwt.verify(token, JWT_SECRET) as any
         return decoded
     } catch (error) {
         return null
@@ -63,9 +63,10 @@ export async function PUT(request: NextRequest) {
         }
 
         // Prevent self-approval change
-        // @ts-ignore
         const currentUserId = String(user.id)
         const targetId = String(id)
+
+        console.log(`[Admin API] Self-Approval Check - Current: ${currentUserId}, Target: ${targetId}`)
 
         if (currentUserId === targetId) {
             return NextResponse.json({ error: "Cannot change your own approval status" }, { status: 400 })
@@ -97,11 +98,10 @@ export async function DELETE(request: NextRequest) {
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 })
 
     // Prevent self-deletion
-    // @ts-ignore
     const currentUserId = String(user.id)
     const targetId = String(id)
 
-    console.log("Self-Deletion Check:", { currentUserId, targetId })
+    console.log(`[Admin API] Self-Deletion Check - Current: ${currentUserId}, Target: ${targetId}`)
 
     if (currentUserId === targetId) {
         return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 })

@@ -35,33 +35,55 @@ interface Admin {
 export default function AdminsPage() {
     const [admins, setAdmins] = useState<Admin[]>([])
     const [loading, setLoading] = useState(true)
+    const [currentAdminProfile, setCurrentAdminProfile] = useState<any>(null)
 
-    const fetchAdmins = async () => {
+    const fetchData = async () => {
+        setLoading(true)
         try {
-            const res = await fetch('/api/admins')
-            const data = await res.json()
-            if (data.admins) {
-                setAdmins(data.admins)
-            }
+            const [adminsRes, profileRes] = await Promise.all([
+                fetch('/api/admins'),
+                fetch('/api/profile')
+            ])
+
+            const [adminsData, profileData] = await Promise.all([
+                adminsRes.json(),
+                profileRes.json()
+            ])
+
+            if (adminsData.admins) setAdmins(adminsData.admins)
+            if (profileData.profile) setCurrentAdminProfile(profileData.profile)
         } catch (error) {
             console.error(error)
-            toast.error('Failed to fetch admins')
+            toast.error('Failed to fetch data')
         } finally {
             setLoading(false)
         }
     }
 
     useEffect(() => {
-        fetchAdmins()
+        fetchData()
     }, [])
 
     const handleApprove = async (id: string, currentStatus: boolean) => {
+        // Double check UI level
+        if (currentAdminProfile?.id === id) {
+            toast.error("You cannot change your own approval status")
+            return
+        }
+
         try {
-            await fetch('/api/admins', {
+            const res = await fetch('/api/admins', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, isApproved: !currentStatus })
             })
+
+            const data = await res.json()
+            if (!res.ok) {
+                toast.error(data.error || 'Action failed')
+                return
+            }
+
             setAdmins(prev => prev.map(a => a.id === id ? { ...a, isApproved: !currentStatus } : a))
             toast.success(currentStatus ? 'Admin disabled' : 'Admin approved')
         } catch (error) {
@@ -128,15 +150,30 @@ export default function AdminsPage() {
                                 {pendingAdmins.map((admin, index) => (
                                     <TableRow key={admin.id}>
                                         <TableCell>{index + 1}</TableCell>
-                                        <TableCell className="font-medium">{admin.name}</TableCell>
+                                        <TableCell className="font-medium">
+                                            {admin.name}
+                                            {currentAdminProfile?.id === admin.id && (
+                                                <Badge variant="secondary" className="ml-2 text-[10px] py-0 px-1">You</Badge>
+                                            )}
+                                        </TableCell>
                                         <TableCell>{admin.email}</TableCell>
                                         <TableCell>{new Date(admin.createdAt).toLocaleDateString()}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
-                                                <Button size="sm" onClick={() => handleApprove(admin.id, false)} className="bg-green-600 hover:bg-green-700">
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => handleApprove(admin.id, false)}
+                                                    className="bg-green-600 hover:bg-green-700"
+                                                    disabled={currentAdminProfile?.id === admin.id}
+                                                >
                                                     <Check className="h-4 w-4 mr-1" /> Approve
                                                 </Button>
-                                                <Button size="sm" variant="destructive" onClick={() => handleDelete(admin.id)}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    onClick={() => handleDelete(admin.id)}
+                                                    disabled={currentAdminProfile?.id === admin.id}
+                                                >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -172,7 +209,12 @@ export default function AdminsPage() {
                             {activeAdmins.map((admin, index) => (
                                 <TableRow key={admin.id}>
                                     <TableCell>{index + 1}</TableCell>
-                                    <TableCell className="font-medium">{admin.name}</TableCell>
+                                    <TableCell className="font-medium">
+                                        {admin.name}
+                                        {currentAdminProfile?.id === admin.id && (
+                                            <Badge variant="secondary" className="ml-2 text-[10px] py-0 px-1">You</Badge>
+                                        )}
+                                    </TableCell>
                                     <TableCell>{admin.email}</TableCell>
                                     <TableCell>
                                         {admin.isVerified ? (
@@ -184,10 +226,20 @@ export default function AdminsPage() {
                                     <TableCell>{admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString() : 'Never'}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button size="sm" variant="outline" onClick={() => handleApprove(admin.id, true)}>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleApprove(admin.id, true)}
+                                                disabled={currentAdminProfile?.id === admin.id}
+                                            >
                                                 Disable
                                             </Button>
-                                            <Button size="sm" variant="ghost" onClick={() => handleDelete(admin.id)}>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => handleDelete(admin.id)}
+                                                disabled={currentAdminProfile?.id === admin.id}
+                                            >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
                                         </div>
