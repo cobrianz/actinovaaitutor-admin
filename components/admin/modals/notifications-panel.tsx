@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Bell, Check, CheckCheck, X, AlertTriangle, Info, CheckCircle, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -47,10 +46,10 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const fetchNotifications = async () => {
     try {
-      // Don't set loading true on every poll to avoid UI flicker
       if (notifications.length === 0) setLoading(true)
       const res = await fetch('/api/notifications')
       const data = await res.json()
@@ -65,6 +64,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
   }
 
   useEffect(() => {
+    setMounted(true)
     fetchNotifications()
     const interval = setInterval(fetchNotifications, 60000)
     return () => clearInterval(interval)
@@ -90,7 +90,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })))
       await fetch('/api/notifications', {
         method: 'PATCH',
-        body: JSON.stringify({}) // Empty body for "mark all" logic in API
+        body: JSON.stringify({})
       })
       toast.success('All notifications marked as read')
     } catch (error) {
@@ -134,10 +134,18 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
     }
   }
 
+  if (!mounted) {
+    return (
+      <div className="relative inline-flex">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <div className="relative inline-flex">
+        <div className="relative inline-flex cursor-pointer">
           {children}
           {unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-500 pointer-events-none">
@@ -200,7 +208,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                             {timeAgo(notification.timestamp)}
                           </p>
                         </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1">
                           {!notification.read && (
                             <Button
                               variant="ghost"

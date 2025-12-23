@@ -62,6 +62,15 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: "Admin not found" }, { status: 404 })
         }
 
+        // Prevent self-approval change
+        // @ts-ignore
+        const currentUserId = String(user.id)
+        const targetId = String(id)
+
+        if (currentUserId === targetId) {
+            return NextResponse.json({ error: "Cannot change your own approval status" }, { status: 400 })
+        }
+
         await adminsCollection.updateOne(
             { _id: new ObjectId(id) },
             { $set: { isApproved } }
@@ -86,6 +95,17 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id")
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 })
+
+    // Prevent self-deletion
+    // @ts-ignore
+    const currentUserId = String(user.id)
+    const targetId = String(id)
+
+    console.log("Self-Deletion Check:", { currentUserId, targetId })
+
+    if (currentUserId === targetId) {
+        return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 })
+    }
 
 
     try {
