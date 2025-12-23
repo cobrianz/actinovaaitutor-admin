@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2 } from "lucide-react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -26,6 +26,8 @@ export default function LoginPage() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
+    const [showSecretKey2, setShowSecretKey2] = useState(false)
 
     const {
         register,
@@ -113,12 +115,22 @@ export default function LoginPage() {
                                 Forgot password?
                             </Link>
                         </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Enter password"
-                            {...register("password")}
-                        />
+                        <div className="relative">
+                            <Input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter password"
+                                {...register("password")}
+                                className="pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
                         {errors.password && (
                             <p className="text-sm text-red-500">{errors.password.message}</p>
                         )}
@@ -126,12 +138,22 @@ export default function LoginPage() {
 
                     <div className="space-y-2">
                         <Label htmlFor="secretKey2">Secret Key 2</Label>
-                        <Input
-                            id="secretKey2"
-                            type="password"
-                            placeholder="Enter secret key 2"
-                            {...register("secretKey2")}
-                        />
+                        <div className="relative">
+                            <Input
+                                id="secretKey2"
+                                type={showSecretKey2 ? "text" : "password"}
+                                placeholder="Enter secret key 2"
+                                {...register("secretKey2")}
+                                className="pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowSecretKey2(!showSecretKey2)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                                {showSecretKey2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
                         {errors.secretKey2 && (
                             <p className="text-sm text-red-500">{errors.secretKey2.message}</p>
                         )}
