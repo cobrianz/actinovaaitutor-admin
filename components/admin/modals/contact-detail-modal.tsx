@@ -26,11 +26,11 @@ interface ContactDetailModalProps {
 export function ContactDetailModal({ open, onOpenChange, contact, onStatusChange }: ContactDetailModalProps) {
   if (!contact) return null
 
-  const statusColors = {
-    new: "bg-blue-500/10 text-blue-500",
-    inProgress: "bg-yellow-500/10 text-yellow-500",
-    resolved: "bg-green-500/10 text-green-500",
-    closed: "bg-gray-500/10 text-gray-500",
+  const statusColors: Record<string, string> = {
+    "new": "bg-blue-500/10 text-blue-500",
+    "in-progress": "bg-yellow-500/10 text-yellow-500",
+    "resolved": "bg-green-500/10 text-green-500",
+    "closed": "bg-gray-500/10 text-gray-500",
   }
 
   return (
@@ -42,7 +42,7 @@ export function ContactDetailModal({ open, onOpenChange, contact, onStatusChange
               <DialogTitle className="text-2xl">{contact.name}</DialogTitle>
               <DialogDescription className="text-sm mt-1">{contact.subject}</DialogDescription>
             </div>
-            <Badge className={statusColors[contact.status]}>{contact.status}</Badge>
+            <Badge className={statusColors[contact.status] || "bg-gray-500/10 text-gray-500"}>{contact.status}</Badge>
           </div>
         </DialogHeader>
 
@@ -65,11 +65,13 @@ export function ContactDetailModal({ open, onOpenChange, contact, onStatusChange
               <span className="text-muted-foreground">Received:</span>
               <span className="font-medium">{new Date(contact.createdAt).toLocaleDateString()}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Type:</span>
-              <Badge variant="outline">{contact.type}</Badge>
-            </div>
+            {contact.category && (
+              <div className="flex items-center gap-2 text-sm">
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Category:</span>
+                <Badge variant="outline">{contact.category}</Badge>
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -79,20 +81,20 @@ export function ContactDetailModal({ open, onOpenChange, contact, onStatusChange
             <div className="glass p-4 rounded-lg text-sm whitespace-pre-wrap">{contact.message}</div>
           </div>
 
-          {contact.company && (
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Company:</span>
-              <span className="font-medium">{contact.company}</span>
+          {contact.adminNotes && (
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">Admin Logs</Label>
+              <div className="glass p-4 rounded-lg text-sm whitespace-pre-wrap font-mono bg-black/5">{contact.adminNotes}</div>
             </div>
           )}
+
         </div>
 
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button variant="outline" onClick={() => onStatusChange("inProgress")}>
+          <Button variant="outline" onClick={() => onStatusChange("in-progress")}>
             Mark In Progress
           </Button>
           <Button className="gradient-primary text-primary-foreground" onClick={() => onStatusChange("resolved")}>

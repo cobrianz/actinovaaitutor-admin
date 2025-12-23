@@ -1,67 +1,95 @@
 import { NextResponse } from "next/server"
-import type { Contact } from "@/lib/types"
+import { connectToDatabase } from "@/lib/mongodb"
 
-const generateDemoContacts = (): Contact[] => {
-  return Array.from({ length: 40 }, (_, i) => ({
-    _id: `contact-${i + 1}`,
-    name: ["John Doe", "Jane Smith", "Alice Johnson", "Bob Wilson"][i % 4],
-    email: `contact${i + 1}@example.com`,
-    phone: `+1-555-${String(Math.floor(Math.random() * 9000) + 1000).padStart(4, "0")}`,
-    subject: ["Technical Support", "Course Inquiry", "Billing Question", "General Feedback", "Partnership Opportunity"][
-      i % 5
-    ],
-    message: "This is a demo message from a user reaching out for assistance.",
-    status: ["new", "in-progress", "resolved", "closed"][i % 4] as any,
-    priority: ["low", "medium", "high", "urgent"][i % 4] as any,
-    assignedTo: i % 3 === 0 ? "admin" : undefined,
-    tags: [`tag-${(i % 5) + 1}`],
-    source: ["website", "email", "phone", "chat"][i % 4] as any,
-    createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-    resolvedAt: i % 4 === 2 ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() : undefined,
-  }))
-}
-
+// GET /api/contacts - Get all contacts with filters
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const search = searchParams.get("search") || ""
   const status = searchParams.get("status") || "all"
-  const priority = searchParams.get("priority") || "all"
+  const category = searchParams.get("category") || "all"
   const page = Number.parseInt(searchParams.get("page") || "1")
   const limit = Number.parseInt(searchParams.get("limit") || "10")
 
-  let contacts = generateDemoContacts()
+  try {
+    const { db } = await connectToDatabase()
 
-  if (search) {
-    contacts = contacts.filter(
-      (c) =>
-        c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase()),
-    )
-  }
-  if (status !== "all") {
-    contacts = contacts.filter((c) => c.status === status)
-  }
-  if (priority !== "all") {
-    contacts = contacts.filter((c) => c.priority === priority)
-  }
+    const query: any = {}
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { subject: { $regex: search, $options: "i" } }
+      ]
+    }
+    if (status !== "all") {
+      query.status = status.toLowerCase()
+    }
+    if (category !== "all") {
+      query.category = category.toLowerCase()
+    }
 
-  const total = contacts.length
-  const paginatedContacts = contacts.slice((page - 1) * limit, page * limit)
+    const total = await db.collection("contacts").countDocuments(query)
+    const rawContacts = await db.collection("contacts")
+      .find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray()
 
-  return NextResponse.json({
-    contacts: paginatedContacts,
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  })
+    const contacts = rawContacts.map((doc: any) => ({
+      _id: doc._id.toString(),
+      name: doc.name || "Anonymous",
+      email: doc.email || "No Email",
+      subject: doc.subject || "No Subject",
+      message: doc.message || "",
+      category: doc.category || "general",
+      status: doc.status || "new",
+      adminNotes: doc.adminNotes || "",
+      createdAt: doc.createdAt || new Date().toISOString(),
+      updatedAt: doc.updatedAt || new Date().toISOString(),
+    }))
+
+    return NextResponse.json({
+      contacts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching contacts from MongoDB:", error)
+    return NextResponse.json({ error: "Failed to fetch contacts" }, { status: 500 })
+  }
 }
 
+// POST /api/contacts - Create new contact/ticket
 export async function POST(request: Request) {
-  const body = await request.json()
-  const newContact: Contact = {
-    _id: `contact-${Date.now()}`,
-    ...body,
-    status: "new",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+  try {
+    const body = await request.json()
+    const { db } = await connectToDatabase()
+
+    const newDoc = {
+      name: body.name,
+      email: body.email,
+      subject: body.subject,
+      message: body.message,
+      category: body.category || "general",
+      status: body.status || "new",
+      adminNotes: body.adminNotes || "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    const result = await db.collection("contacts").insertOne(newDoc)
+
+    return NextResponse.json({
+      contact: { ...newDoc, _id: result.insertedId.toString() },
+      message: "Contact created successfully"
+    })
+  } catch (error) {
+    console.error("Error creating contact in MongoDB:", error)
+    return NextResponse.json({ error: "Failed to create contact" }, { status: 500 })
   }
-  return NextResponse.json({ contact: newContact, message: "Contact created successfully" })
 }

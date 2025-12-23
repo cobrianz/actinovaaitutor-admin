@@ -21,25 +21,37 @@ export interface User {
   name: string
   email: string
   password?: string
+  role: "student" | "teacher" | "admin"
   status: "active" | "inactive" | "pending" | "suspended"
   subscription: {
-    plan: "Free" | "Pro"
+    plan: "Free" | "Premium" | "Enterprise"
     startDate: string
     endDate?: string
     status: "active" | "cancelled" | "expired"
   }
+  billingHistory?: {
+    id?: string
+    invoiceId?: string
+    amount: number
+    currency?: string
+    date: string
+    status: "paid" | "pending" | "failed"
+    plan?: string
+    method?: string
+  }[]
   profile: {
     avatar?: string
     bio?: string
     country?: string
+    phone?: string
     timezone?: string
     language?: string
   }
   stats: {
-    coursesEnrolled: number
-    coursesCompleted: number
-    totalStudyTime: number // minutes
     lastLogin: string
+    totalChats?: number
+    totalNotes?: number
+    totalFlashcards?: number
   }
   joinedDate: string
   createdAt: string
@@ -57,15 +69,13 @@ export interface Course {
   modules: Module[]
   thumbnail?: string
   status: "Published" | "Draft" | "Archived"
+  source?: "official" | "community" | "trending"
   pricing: {
     isFree: boolean
     price?: number
   }
   stats: {
-    enrollments: number
-    completions: number
     avgRating: number
-    totalReviews: number
   }
   createdDate: string
   createdAt: string
@@ -90,41 +100,55 @@ export interface Resource {
 
 export interface Flashcard {
   _id: string
-  question: string
-  answer: string
-  course: string
-  difficulty: "Easy" | "Medium" | "Hard"
-  tags: string[]
-  category: string
-  stats: {
-    views: number
-    correct: number
-    incorrect: number
-    avgResponseTime: number
+  // Legacy fields (for backward compatibility)
+  question?: string
+  answer?: string
+  course?: string
+  // New fields from API
+  title?: string
+  topic?: string
+  creator?: string
+  totalCards?: number
+  progress?: number
+  completed?: boolean
+  isPremium?: boolean
+  bookmarked?: boolean
+  difficulty?: string | "Easy" | "Medium" | "Hard"
+  tags?: string[]
+  category?: string
+  stats?: {
+    views?: number
+    avgResponseTime?: number
   }
-  createdBy: string
-  status: "active" | "inactive"
+  createdBy?: string
+  status?: "active" | "inactive"
   createdAt: string
-  updatedAt: string
+  updatedAt?: string
+  lastAccessed?: string
 }
 
 export interface Quiz {
   _id: string
   title: string
-  description: string
-  course: string
-  questions: Question[]
-  difficulty: "Easy" | "Medium" | "Hard"
-  duration: number // minutes
-  passingScore: number // percentage
-  stats: {
-    attempts: number
-    avgScore: number
-    completions: number
+  description?: string
+  course?: string
+  questions?: Question[]
+  difficulty?: string | "Easy" | "Medium" | "Hard"
+  duration?: number // minutes
+  passingScore?: number // percentage
+  stats?: {
+    views?: number
   }
-  status: "active" | "inactive"
+  status?: "active" | "inactive"
   createdAt: string
-  updatedAt: string
+  updatedAt?: string
+  // New fields from API
+  questionCount?: number
+  totalPoints?: number
+  creator?: string
+  attempts?: number
+  avgScore?: number
+  passRate?: number
 }
 
 export interface Question {
@@ -171,10 +195,12 @@ export interface Contact {
   subject: string
   message: string
   status: "new" | "in-progress" | "resolved" | "closed"
-  priority: "low" | "medium" | "high" | "urgent"
+  priority?: "low" | "medium" | "high" | "urgent"
+  category?: string
+  adminNotes?: string
   assignedTo?: string
-  tags: string[]
-  source: "website" | "email" | "phone" | "chat"
+  tags?: string[]
+  source?: "website" | "email" | "phone" | "chat"
   createdAt: string
   updatedAt: string
   resolvedAt?: string

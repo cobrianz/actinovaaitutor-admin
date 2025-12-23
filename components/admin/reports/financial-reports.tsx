@@ -52,18 +52,18 @@ const planPerformance = [
 ]
 
 const financialSummary = [
-  { period: "Q4 2024", revenue: "$135,420", refunds: "$4,230", net: "$131,190", growth: "+12.3%" },
-  { period: "Q3 2024", revenue: "$128,340", refunds: "$3,890", net: "$124,450", growth: "+9.8%" },
-  { period: "Q2 2024", revenue: "$121,560", refunds: "$3,560", net: "$118,000", growth: "+8.5%" },
-  { period: "Q1 2024", revenue: "$115,230", refunds: "$3,120", net: "$112,110", growth: "+7.2%" },
+  { period: "Q4 2024", revenue: "KSh 17,604,600", refunds: "KSh 549,900", net: "KSh 17,054,700", growth: "+12.3%" },
+  { period: "Q3 2024", revenue: "KSh 16,684,200", refunds: "KSh 505,700", net: "KSh 16,178,500", growth: "+9.8%" },
+  { period: "Q2 2024", revenue: "KSh 15,802,800", refunds: "KSh 462,800", net: "KSh 15,340,000", growth: "+8.5%" },
+  { period: "Q1 2024", revenue: "KSh 14,979,900", refunds: "KSh 405,600", net: "KSh 14,574,300", growth: "+7.2%" },
 ]
 
 const recentTransactions = [
-  { date: "2025-01-15", user: "Alice Johnson", amount: "$49.99", status: "Success", plan: "Pro" },
-  { date: "2025-01-15", user: "Bob Smith", amount: "$29.99", status: "Success", plan: "Basic" },
-  { date: "2025-01-15", user: "Carol Williams", amount: "$99.99", status: "Pending", plan: "Enterprise" },
-  { date: "2025-01-14", user: "David Brown", amount: "$49.99", status: "Success", plan: "Pro" },
-  { date: "2025-01-14", user: "Emma Davis", amount: "$29.99", status: "Failed", plan: "Basic" },
+  { date: "2025-01-15", user: "Alice Johnson", amount: "KSh 4,500", status: "Success", plan: "Premium" },
+  { date: "2025-01-15", user: "Bob Smith", amount: "KSh 4,500", status: "Success", plan: "Premium" },
+  { date: "2025-01-15", user: "Carol Williams", amount: "KSh 4,500", status: "Pending", plan: "Premium" },
+  { date: "2025-01-14", user: "David Brown", amount: "KSh 4,500", status: "Success", plan: "Premium" },
+  { date: "2025-01-14", user: "Emma Davis", amount: "KSh 4,500", status: "Failed", plan: "Premium" },
 ]
 
 export function FinancialReports() {
@@ -122,7 +122,7 @@ export function FinancialReports() {
             <CardDescription>Actual vs projected revenue</CardDescription>
           </CardHeader>
           <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={revenueProjections}>
                 <XAxis
                   dataKey="month"

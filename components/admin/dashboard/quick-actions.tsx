@@ -4,13 +4,21 @@ import { Button } from "@/components/ui/button"
 import { Download, Bell, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
-export function QuickActions() {
+interface QuickActionsProps {
+  onRefresh?: () => void
+  onExport?: () => void
+}
+
+export function QuickActions({ onRefresh, onExport }: QuickActionsProps) {
   return (
     <div className="flex items-center gap-2">
       <Button
         variant="outline"
         size="sm"
-        onClick={() => toast.success("Dashboard data refreshed")}
+        onClick={() => {
+          onRefresh?.()
+          toast.success("Dashboard data refreshed")
+        }}
         className="glass border-border/50"
       >
         <RefreshCw className="h-4 w-4 mr-2" />
@@ -19,7 +27,10 @@ export function QuickActions() {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => toast.info("Exporting dashboard data...")}
+        onClick={() => {
+          onExport?.()
+          toast.info("Exporting dashboard data...")
+        }}
         className="glass border-border/50"
       >
         <Download className="h-4 w-4 mr-2" />

@@ -1,5 +1,6 @@
 import { UserManagementTable } from "@/components/admin/users/user-management-table"
 import { UserAnalyticsCharts } from "@/components/admin/users/user-analytics-charts"
+import { UserMetrics } from "@/components/admin/users/user-metrics"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -17,6 +18,9 @@ export default function UsersPage() {
           <p className="text-foreground-muted mt-1">Manage users, subscriptions, and view user analytics</p>
         </div>
       </div>
+
+      {/* User Metrics Cards */}
+      <UserMetrics />
 
       {/* Analytics Charts */}
       <UserAnalyticsCharts />

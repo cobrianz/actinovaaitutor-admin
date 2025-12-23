@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { X, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 interface PlanModalProps {
   isOpen: boolean
@@ -18,12 +19,18 @@ interface PlanModalProps {
 export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
   const [features, setFeatures] = useState<string[]>([])
   const [newFeature, setNewFeature] = useState("")
+  const [isActive, setIsActive] = useState(true)
+  const [isFeatured, setIsFeatured] = useState(false)
 
   useEffect(() => {
     if (plan) {
       setFeatures(plan.features || [])
+      setIsActive(plan.status === "active")
+      setIsFeatured(!!plan.featured)
     } else {
       setFeatures([])
+      setIsActive(true)
+      setIsFeatured(false)
     }
   }, [plan])
 
@@ -38,6 +45,45 @@ export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
     setFeatures(features.filter((_, i) => i !== index))
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const form = e.target as HTMLFormElement
+    const name = (form.elements.namedItem("name") as HTMLInputElement).value
+    const price = parseFloat((form.elements.namedItem("price") as HTMLInputElement).value)
+    const billing = (form.elements.namedItem("billing") as HTMLSelectElement).value
+    const description = (form.elements.namedItem("description") as HTMLTextAreaElement).value
+
+    const payload = {
+      ...(plan && { _id: plan._id, id: plan.id }),
+      name,
+      price,
+      billing,
+      description,
+      features,
+      status: isActive ? "active" : "inactive",
+      featured: isFeatured
+    }
+
+    try {
+      const response = await fetch('/api/billing/plans', {
+        method: plan ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (response.ok) {
+        toast.success(plan ? "Plan updated successfully" : "Plan created successfully")
+        onClose()
+      } else {
+        const error = await response.json()
+        toast.error(error.error || "Failed to save plan")
+      }
+    } catch (error) {
+      console.error("Error saving plan:", error)
+      toast.error("Error saving plan")
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="glass-card border-accent/20 max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -48,7 +94,7 @@ export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Plan Name</Label>
@@ -56,8 +102,8 @@ export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price (USD)</Label>
-              <Input id="price" type="number" placeholder="39.99" defaultValue={plan?.price} className="glass-input" />
+              <Label htmlFor="price">Price (KSh)</Label>
+              <Input id="price" type="number" placeholder="4500" defaultValue={plan?.price} className="glass-input" />
             </div>
           </div>
 
@@ -124,7 +170,7 @@ export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
               <Label htmlFor="active">Active Status</Label>
               <p className="text-sm text-foreground-muted">Make this plan available to users</p>
             </div>
-            <Switch id="active" defaultChecked={plan?.status === "active"} />
+            <Switch id="active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
 
           <div className="flex items-center justify-between p-4 rounded-lg glass-subtle">
@@ -132,7 +178,7 @@ export function PlanModal({ isOpen, onClose, plan }: PlanModalProps) {
               <Label htmlFor="featured">Featured Plan</Label>
               <p className="text-sm text-foreground-muted">Highlight this plan as recommended</p>
             </div>
-            <Switch id="featured" defaultChecked={plan?.featured} />
+            <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
           </div>
 
           <div className="flex gap-3 pt-4">

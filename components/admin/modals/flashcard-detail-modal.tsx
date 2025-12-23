@@ -1,11 +1,13 @@
 "use client"
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Star, Users, Clock, TrendingUp } from "lucide-react"
-import { useState } from "react"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { toast } from "sonner"
 
 interface FlashcardDetailModalProps {
   isOpen: boolean
@@ -14,110 +16,97 @@ interface FlashcardDetailModalProps {
 }
 
 export function FlashcardDetailModal({ isOpen, onClose, flashcard }: FlashcardDetailModalProps) {
-  const [isFlipped, setIsFlipped] = useState(false)
+  const [fullFlashcard, setFullFlashcard] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchFullDetails = async () => {
+      if (isOpen && flashcard?._id) {
+        setLoading(true)
+        try {
+          const response = await fetch(`/api/flashcards/${flashcard._id}`)
+          const data = await response.json()
+          if (data.flashcard) {
+            setFullFlashcard(data.flashcard)
+          }
+        } catch (error) {
+          console.error("Failed to fetch details:", error)
+          toast.error("Failed to load flashcard details")
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+    fetchFullDetails()
+  }, [isOpen, flashcard])
 
   if (!flashcard) return null
 
+  const displayData = fullFlashcard || flashcard
+  const cards = displayData.cards || []
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl glass border-border/50">
+      <DialogContent className="glass-strong max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Flashcard Set Details</DialogTitle>
-          <DialogDescription>{flashcard.title}</DialogDescription>
+          <DialogTitle className="text-2xl text-gradient">Flashcard Set Details</DialogTitle>
+          <DialogDescription>View set details and cards.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Rating</span>
-                </div>
-                <p className="text-2xl font-bold">{flashcard.rating}</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Usage</span>
-                </div>
-                <p className="text-2xl font-bold">{flashcard.usage}</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Cards</span>
-                </div>
-                <p className="text-2xl font-bold">{flashcard.cards}</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Success</span>
-                </div>
-                <p className="text-2xl font-bold">87%</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Flashcard Preview */}
-          <div>
-            <h3 className="font-semibold mb-3">Preview Flashcards</h3>
-            <div className="relative h-64 cursor-pointer perspective-1000" onClick={() => setIsFlipped(!isFlipped)}>
-              <div
-                className={`absolute inset-0 transition-transform duration-500 transform-style-3d ${
-                  isFlipped ? "rotate-y-180" : ""
-                }`}
-              >
-                {/* Front */}
-                <Card
-                  className={`absolute inset-0 glass border-border/50 backface-hidden ${
-                    isFlipped ? "invisible" : "visible"
-                  }`}
-                >
-                  <CardContent className="h-full flex items-center justify-center p-8">
-                    <div className="text-center">
-                      <Badge className="mb-4">Question</Badge>
-                      <p className="text-xl font-medium">What is a closure in JavaScript?</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Back */}
-                <Card
-                  className={`absolute inset-0 glass border-border/50 backface-hidden rotate-y-180 ${
-                    isFlipped ? "visible" : "invisible"
-                  }`}
-                >
-                  <CardContent className="h-full flex items-center justify-center p-8">
-                    <div className="text-center">
-                      <Badge className="mb-4">Answer</Badge>
-                      <p className="text-lg">
-                        A closure is a function that has access to variables in its outer scope, even after the outer
-                        function has returned.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm">
+                {displayData.title}
               </div>
             </div>
-            <p className="text-center text-sm text-foreground-muted mt-3">Click card to flip</p>
+            <div className="space-y-2">
+              <Label>Topic</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm">
+                {displayData.topic}
+              </div>
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose} className="glass border-border/50 bg-transparent">
+          <div className="space-y-2">
+            <Label>Difficulty</Label>
+            <div>
+              <Badge variant={displayData.difficulty === 'beginner' ? 'default' : displayData.difficulty === 'intermediate' ? 'secondary' : 'destructive'} className="capitalize">
+                {displayData.difficulty || 'N/A'}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Cards in this Set ({cards.length})</h3>
+              {loading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+            </div>
+
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
+              {cards.length > 0 ? (
+                cards.map((card: any, index: number) => (
+                  <div key={index} className="flex items-start justify-between p-3 glass border border-border/50 rounded hover:bg-background/50">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm mb-1"><span className="text-primary font-bold">Q:</span> {card.front || card.question}</p>
+                      <p className="text-sm text-foreground-muted"><span className="text-secondary font-bold">A:</span> {card.back || card.answer}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-foreground-muted glass border border-dashed border-border/50 rounded-lg">
+                  No cards available.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button className="gradient-primary">Edit Flashcard Set</Button>
-          </div>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

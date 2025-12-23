@@ -27,7 +27,7 @@ export function DeleteConfirmModal({ open, onOpenChange, title, description, onC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-md">
+      <DialogContent className="glass-strong max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-destructive/10">

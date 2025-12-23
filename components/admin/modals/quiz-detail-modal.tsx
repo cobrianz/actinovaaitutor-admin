@@ -1,11 +1,11 @@
 "use client"
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BarChart3, Users, CheckCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { Check, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
 
 interface QuizDetailModalProps {
   isOpen: boolean
@@ -14,169 +14,124 @@ interface QuizDetailModalProps {
 }
 
 export function QuizDetailModal({ isOpen, onClose, quiz }: QuizDetailModalProps) {
+  const [fullQuiz, setFullQuiz] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchFullDetails = async () => {
+      if (isOpen && quiz?._id) {
+        setLoading(true)
+        try {
+          const response = await fetch(`/api/tests/${quiz._id}`)
+          const data = await response.json()
+          if (data.test) {
+            setFullQuiz(data.test)
+          }
+        } catch (error) {
+          console.error("Failed to fetch quiz details:", error)
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+    fetchFullDetails()
+  }, [isOpen, quiz])
+
   if (!quiz) return null
+
+  const displayQuiz = fullQuiz || quiz
+  // Ensure questions is an array
+  const questions = Array.isArray(displayQuiz.questions) ? displayQuiz.questions : []
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass border-border/50">
+      <DialogContent className="glass-strong max-w-full sm:max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-full m-4 sm:m-0">
         <DialogHeader>
-          <DialogTitle>Quiz Details</DialogTitle>
-          <DialogDescription>{quiz.title}</DialogDescription>
+          <DialogTitle className="text-2xl text-gradient">Quiz Details</DialogTitle>
+          <DialogDescription>View quiz settings and questions.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <BarChart3 className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Questions</span>
-                </div>
-                <p className="text-2xl font-bold">{quiz.questions}</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Attempts</span>
-                </div>
-                <p className="text-2xl font-bold">{quiz.attempts}</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Avg Score</span>
-                </div>
-                <p className="text-2xl font-bold">{quiz.avgScore}%</p>
-              </CardContent>
-            </Card>
-            <Card className="glass border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-foreground-muted">Pass Rate</span>
-                </div>
-                <p className="text-2xl font-bold">{quiz.passRate}%</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm break-all">
+                {displayQuiz.title}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Course / Subject</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm">
+                {displayQuiz.course || displayQuiz.subject || "N/A"}
+              </div>
+            </div>
           </div>
 
-          {/* Tabs */}
-          <Tabs defaultValue="questions" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 glass border-border/50">
-              <TabsTrigger value="questions">Questions</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Difficulty</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm capitalize">
+                <Badge variant={displayQuiz.difficulty === 'easy' ? 'secondary' : displayQuiz.difficulty === 'hard' ? 'destructive' : 'default'} className="capitalize">
+                  {displayQuiz.difficulty || 'Medium'}
+                </Badge>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Time Limit (min)</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm">
+                {displayQuiz.timeLimit || 30}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Pass Score (%)</Label>
+              <div className="glass p-2 rounded-md border border-input text-sm">
+                {displayQuiz.passingScore || 70}
+              </div>
+            </div>
+          </div>
 
-            <TabsContent value="questions" className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="p-4 rounded-lg glass-subtle space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white font-semibold text-sm">
-                        {i}
-                      </div>
-                      <div className="space-y-2">
-                        <p className="font-medium">What is the output of console.log(typeof null)?</p>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-4 h-4 rounded-full border-2 border-foreground-muted" />
-                            <span>undefined</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-                              <CheckCircle className="h-3 w-3 text-white" />
-                            </div>
-                            <span className="font-medium">object</span>
-                            <Badge variant="outline" className="text-xs">
-                              Correct
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-4 h-4 rounded-full border-2 border-foreground-muted" />
-                            <span>null</span>
-                          </div>
+          {loading ? (
+            <div className="h-40 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="border-t border-border pt-4 space-y-4">
+              <h3 className="font-semibold">Questions ({questions.length})</h3>
+
+              <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
+                {questions.length > 0 ? (
+                  questions.map((q: any, index: number) => (
+                    <div key={index} className="flex items-start justify-between p-3 glass border border-border/50 rounded hover:bg-background/50">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm mb-1">{q.text || q.question}</p>
+                        <p className="text-xs text-foreground-muted mb-1">
+                          Options: {q.options ? q.options.join(", ") : "No options"}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="font-semibold text-primary">Correct Answer:</span>
+                          <Badge variant="outline" className="text-xs bg-green-500/10 text-green-500 border-green-500/20">
+                            <Check className="h-3 w-3 mr-1" />
+                            {q.correctAnswer}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                    <Badge variant="outline">85% correct</Badge>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-foreground-muted glass border border-dashed border-border/50 rounded-lg">
+                    No questions available.
                   </div>
-                </div>
-              ))}
-            </TabsContent>
+                )}
+              </div>
+            </div>
+          )}
 
-            <TabsContent value="performance" className="space-y-4">
-              <Card className="glass border-border/50">
-                <CardHeader>
-                  <CardTitle>Question Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { q: "Question 1", correct: 92 },
-                      { q: "Question 2", correct: 78 },
-                      { q: "Question 3", correct: 65 },
-                      { q: "Question 4", correct: 88 },
-                      { q: "Question 5", correct: 71 },
-                    ].map((item, i) => (
-                      <div key={i} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{item.q}</span>
-                          <span className="text-foreground-muted">{item.correct}% correct</span>
-                        </div>
-                        <div className="h-2 rounded-full bg-background-subtle overflow-hidden">
-                          <div className="h-full gradient-primary" style={{ width: `${item.correct}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
-            <TabsContent value="settings" className="space-y-4">
-              <Card className="glass border-border/50">
-                <CardHeader>
-                  <CardTitle>Quiz Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">Time Limit</span>
-                    <span className="font-medium">30 minutes</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">Passing Score</span>
-                    <span className="font-medium">70%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">Attempts Allowed</span>
-                    <span className="font-medium">3</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">Randomize Questions</span>
-                    <Badge variant="default">Enabled</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground-muted">Show Correct Answers</span>
-                    <Badge variant="default">After Completion</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose} className="glass border-border/50 bg-transparent">
+          <DialogFooter>
+            <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button className="gradient-primary">Edit Quiz</Button>
-          </div>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

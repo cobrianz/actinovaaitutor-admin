@@ -22,9 +22,7 @@ const generateDemoQuizzes = (): Quiz[] => {
     duration: Math.floor(Math.random() * 45) + 15,
     passingScore: 70,
     stats: {
-      attempts: Math.floor(Math.random() * 500) + 100,
-      avgScore: Math.floor(Math.random() * 30) + 60,
-      completions: Math.floor(Math.random() * 400) + 80,
+      views: Math.floor(Math.random() * 1000) + 200,
     },
     status: ["active", "inactive"][i % 5] as any,
     createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
@@ -66,7 +64,7 @@ export async function POST(request: Request) {
   const newQuiz: Quiz = {
     _id: `quiz-${Date.now()}`,
     ...body,
-    stats: { attempts: 0, avgScore: 0, completions: 0 },
+    stats: { views: 0 },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

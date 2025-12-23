@@ -1,0 +1,276 @@
+{
+  "visitorcounters": {
+    "count": 1,
+    "sampleKeys": [
+      "_id",
+      "count",
+      "lastUpdated",
+      "createdAt",
+      "updatedAt",
+      "__v"
+    ]
+  },
+  "chats": {
+    "count": 1,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "topic",
+      "isActive",
+      "__v",
+      "createdAt",
+      "lastMessageAt",
+      "messages",
+      "updatedAt"
+    ]
+  },
+  "explore_category_courses": {
+    "count": 3,
+    "sampleKeys": [
+      "_id",
+      "category",
+      "courses",
+      "createdAt",
+      "generatedBy"
+    ]
+  },
+  "users": {
+    "count": 2,
+    "sampleKeys": [
+      "_id",
+      "name",
+      "email",
+      "password",
+      "role",
+      "status",
+      "emailVerificationToken",
+      "emailVerificationCode",
+      "emailVerificationExpires",
+      "monthlyUsage",
+      "usageResetDate",
+      "streak",
+      "totalLearningTime",
+      "achievements",
+      "createdAt",
+      "lastActive",
+      "emailVerified",
+      "lastLogin",
+      "loginCount",
+      "ageGroup",
+      "educationLevel",
+      "goals",
+      "interestCategories",
+      "interests",
+      "learningStyle",
+      "onboardingCompleted",
+      "skillLevel",
+      "timeCommitment",
+      "courses",
+      "generatedCardSets",
+      "lastLogout",
+      "refreshTokens",
+      "billingHistory",
+      "subscription",
+      "updatedAt",
+      "generatedPersonalizedCourses",
+      "personalizedCoursesGeneratedAt",
+      "settings"
+    ]
+  },
+  "library": {
+    "count": 10,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "title",
+      "topic",
+      "originalTopic",
+      "difficulty",
+      "format",
+      "level",
+      "totalModules",
+      "totalLessons",
+      "modules",
+      "isPremium",
+      "progress",
+      "completed",
+      "pinned",
+      "createdAt",
+      "lastAccessed",
+      "lastGenerated",
+      "conversation",
+      "lastConversationUpdate"
+    ]
+  },
+  "refreshTokens": {
+    "count": 205,
+    "sampleKeys": [
+      "_id",
+      "token",
+      "jti",
+      "userId",
+      "createdAt",
+      "expiresAt",
+      "revoked",
+      "revokedAt"
+    ]
+  },
+  "cardSets": {
+    "count": 4,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "title",
+      "topic",
+      "originalTopic",
+      "difficulty",
+      "totalCards",
+      "cards",
+      "isPremium",
+      "progress",
+      "completed",
+      "bookmarked",
+      "ankiExportReady",
+      "createdAt",
+      "lastAccessed",
+      "monthlyGenerationUsed"
+    ]
+  },
+  "interactions": {
+    "count": 4,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "postId",
+      "type",
+      "targetId",
+      "createdAt",
+      "updatedAt",
+      "__v"
+    ]
+  },
+  "comments": {
+    "count": 2,
+    "sampleKeys": [
+      "_id",
+      "postId",
+      "userId",
+      "body",
+      "parentId",
+      "likesCount",
+      "repliesCount",
+      "status",
+      "createdAt",
+      "updatedAt",
+      "__v"
+    ]
+  },
+  "user_notes": {
+    "count": 6,
+    "sampleKeys": [
+      "_id",
+      "itemId",
+      "lessonId",
+      "userId",
+      "itemType",
+      "content",
+      "createdAt",
+      "title",
+      "updatedAt"
+    ]
+  },
+  "user_library": {
+    "count": 2,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "pinned",
+      "bookmarks",
+      "totalLearningTime",
+      "streak",
+      "achievements",
+      "createdAt",
+      "updatedAt"
+    ]
+  },
+  "explore_trending": {
+    "count": 1,
+    "sampleKeys": [
+      "_id",
+      "topics",
+      "createdAt",
+      "generatedForUser",
+      "model"
+    ]
+  },
+  "posts": {
+    "count": 2,
+    "sampleKeys": [
+      "_id",
+      "title",
+      "slug",
+      "summary",
+      "content",
+      "tags",
+      "thumbnailUrl",
+      "author",
+      "featured",
+      "period",
+      "periodKey",
+      "likesCount",
+      "bookmarksCount",
+      "commentsCount",
+      "publishedAt",
+      "status",
+      "createdAt",
+      "updatedAt",
+      "__v",
+      "category",
+      "excerpt",
+      "readTime",
+      "trending",
+      "viewsCount"
+    ]
+  },
+  "tests": {
+    "count": 2,
+    "sampleKeys": [
+      "_id",
+      "title",
+      "course",
+      "questions",
+      "userId",
+      "difficulty",
+      "createdAt",
+      "updatedAt"
+    ]
+  },
+  "ai_conversations": {
+    "count": 1,
+    "sampleKeys": [
+      "_id",
+      "userId",
+      "question",
+      "response",
+      "lessonTitle",
+      "context",
+      "createdAt"
+    ]
+  },
+  "contacts": {
+    "count": 1,
+    "sampleKeys": [
+      "_id",
+      "name",
+      "email",
+      "subject",
+      "message",
+      "category",
+      "status",
+      "adminNotes",
+      "createdAt",
+      "updatedAt",
+      "__v"
+    ]
+  }
+}

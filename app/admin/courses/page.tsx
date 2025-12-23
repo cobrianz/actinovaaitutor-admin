@@ -1,5 +1,6 @@
 import { CourseLibrary } from "@/components/admin/courses/course-library"
 import { CourseAnalyticsCharts } from "@/components/admin/courses/course-analytics-charts"
+import { CourseMetrics } from "@/components/admin/courses/course-metrics"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -18,10 +19,13 @@ export default function CoursesPage() {
         </div>
       </div>
 
+      {/* Metric Cards */}
+      <CourseMetrics />
+
       {/* Analytics Charts */}
       <CourseAnalyticsCharts />
 
-      {/* Course Library */}
+      {/* Course Library (Multi-table) */}
       <CourseLibrary />
     </div>
   )

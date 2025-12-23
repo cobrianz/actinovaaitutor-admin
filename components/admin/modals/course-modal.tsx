@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -26,16 +26,31 @@ interface CourseModalProps {
 }
 
 export function CourseModal({ open, onOpenChange, course, onSave }: CourseModalProps) {
-  const [formData, setFormData] = useState<Partial<Course>>(
-    course || {
-      title: "",
-      subject: "",
-      difficulty: "Beginner",
-      status: "draft",
-      topics: 0,
-      estimatedHours: 0,
-    },
-  )
+  const [formData, setFormData] = useState<Partial<Course>>({
+    title: "",
+    description: "",
+    category: "",
+    difficulty: "Beginner",
+  })
+
+  // Update formData when course prop changes (for edit mode)
+  useEffect(() => {
+    if (course) {
+      setFormData({
+        title: course.title || "",
+        description: course.description || "",
+        category: course.category || "",
+        difficulty: course.difficulty || "Beginner",
+      })
+    } else {
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        difficulty: "Beginner",
+      })
+    }
+  }, [course])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,14 +82,14 @@ export function CourseModal({ open, onOpenChange, course, onSave }: CourseModalP
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="category">Category</Label>
               <Input
-                id="subject"
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 required
                 className="glass"
-                placeholder="e.g., Computer Science"
+                placeholder="e.g., Technology"
               />
             </div>
             <div className="space-y-2">
@@ -102,50 +117,9 @@ export function CourseModal({ open, onOpenChange, course, onSave }: CourseModalP
               value={formData.description || ""}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="glass"
-              rows={3}
+              rows={4}
               placeholder="Describe what students will learn..."
             />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="topics">Number of Topics</Label>
-              <Input
-                id="topics"
-                type="number"
-                value={formData.topics}
-                onChange={(e) => setFormData({ ...formData, topics: Number.parseInt(e.target.value) })}
-                className="glass"
-                min="1"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estimatedHours">Estimated Hours</Label>
-              <Input
-                id="estimatedHours"
-                type="number"
-                value={formData.estimatedHours}
-                onChange={(e) => setFormData({ ...formData, estimatedHours: Number.parseInt(e.target.value) })}
-                className="glass"
-                min="1"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as Course["status"] })}
-              >
-                <SelectTrigger className="glass">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
           <DialogFooter>

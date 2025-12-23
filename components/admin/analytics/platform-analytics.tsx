@@ -99,8 +99,7 @@ const conversionFunnel = [
   { stage: "Visitors", count: 50000, percentage: 100 },
   { stage: "Sign-ups", count: 15000, percentage: 30 },
   { stage: "Active Users", count: 12000, percentage: 24 },
-  { stage: "Subscribers", count: 8000, percentage: 16 },
-  { stage: "Premium Users", count: 2000, percentage: 4 },
+  { stage: "Premium Users", count: 2500, percentage: 5 },
 ]
 
 export function PlatformAnalytics() {
@@ -299,72 +298,6 @@ export function PlatformAnalytics() {
                 </Pie>
                 <Tooltip />
               </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="glass border-border/50">
-          <CardHeader>
-            <CardTitle>Geographic Distribution</CardTitle>
-            <CardDescription>Top user countries</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={geographicData.slice(0, 5)}>
-                <defs>
-                  <linearGradient id="colorGeo" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="country"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey="users"
-                  stroke={COLORS.primary}
-                  fillOpacity={1}
-                  fill="url(#colorGeo)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="glass border-border/50">
-          <CardHeader>
-            <CardTitle>User Retention</CardTitle>
-            <CardDescription>Cohort retention over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={retentionData}>
-                <XAxis
-                  dataKey="month"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${value}%`}
-                />
-                <Tooltip formatter={(value) => `${value}%`} />
-                <Line type="monotone" dataKey="cohort1" stroke={COLORS.primary} strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="cohort2" stroke={COLORS.secondary} strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="cohort3" stroke={COLORS.tertiary} strokeWidth={2} dot={false} />
-              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

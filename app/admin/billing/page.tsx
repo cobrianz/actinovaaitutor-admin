@@ -2,7 +2,6 @@ import { BillingOverview } from "@/components/admin/billing/billing-overview"
 import { SubscriptionPlans } from "@/components/admin/billing/subscription-plans"
 import { TransactionHistory } from "@/components/admin/billing/transaction-history"
 import { RevenueCharts } from "@/components/admin/billing/revenue-charts"
-import { PaymentMethods } from "@/components/admin/billing/payment-methods"
 import { InvoiceManagement } from "@/components/admin/billing/invoice-management"
 import type { Metadata } from "next"
 
@@ -29,14 +28,10 @@ export default function BillingPage() {
       {/* Subscription Plans */}
       <SubscriptionPlans />
 
-      {/* Transaction History & Invoices */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Transaction History */}
+      <div>
         <TransactionHistory />
-        <InvoiceManagement />
       </div>
-
-      {/* Payment Methods */}
-      <PaymentMethods />
     </div>
   )
 }

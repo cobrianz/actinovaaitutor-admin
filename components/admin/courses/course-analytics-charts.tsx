@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
   Area,
@@ -17,12 +18,7 @@ import {
   ZAxis,
   Cell,
 } from "recharts"
-import {
-  demoGenerationTrends,
-  demoDifficultyDistribution,
-  demoEnrollmentAnalytics,
-  demoCompletionVsDifficulty,
-} from "@/lib/demo-data"
+import { Loader2 } from "lucide-react"
 
 const COLORS = {
   primary: "var(--color-chart-1)",
@@ -33,6 +29,40 @@ const COLORS = {
 }
 
 export function CourseAnalyticsCharts() {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchCourseAnalytics() {
+      try {
+        const response = await fetch("/api/analytics")
+        const json = await response.json()
+        if (json.analytics?.charts) {
+          setData(json.analytics.charts)
+        }
+      } catch (error) {
+        console.error("Failed to fetch course analytics charts:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCourseAnalytics()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="grid gap-6 md:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="glass border-border/50 h-[400px] flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  if (!data) return null
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Generation Trends */}
@@ -43,7 +73,7 @@ export function CourseAnalyticsCharts() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={demoGenerationTrends}>
+            <LineChart data={data.generationTrends || []}>
               <XAxis
                 dataKey="month"
                 stroke="var(--color-muted-foreground)"
@@ -75,7 +105,7 @@ export function CourseAnalyticsCharts() {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={demoDifficultyDistribution}
+                data={data.difficultyDistribution || []}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -83,104 +113,18 @@ export function CourseAnalyticsCharts() {
                 outerRadius={90}
                 dataKey="value"
               >
-                {demoDifficultyDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
+                {data.difficultyDistribution?.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % 5]} />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Enrollment Analytics */}
-      <Card className="glass border-border/50">
-        <CardHeader>
-          <CardTitle>Enrollment Analytics</CardTitle>
-          <CardDescription>Daily course enrollments over the past month</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={demoEnrollmentAnalytics}>
-              <defs>
-                <linearGradient id="colorEnrollments" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="date"
-                stroke="var(--color-muted-foreground)"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip
-                contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="enrollments"
-                stroke={COLORS.secondary}
-                fillOpacity={1}
-                fill="url(#colorEnrollments)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Completion vs Difficulty */}
-      <Card className="glass border-border/50">
-        <CardHeader>
-          <CardTitle>Completion vs Difficulty</CardTitle>
-          <CardDescription>Course completion rates by difficulty level</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart>
-              <XAxis
-                dataKey="enrollments"
-                stroke="var(--color-muted-foreground)"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                name="Enrollments"
-              />
-              <YAxis
-                dataKey="completion"
-                stroke="var(--color-muted-foreground)"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                name="Completion %"
-              />
-              <ZAxis range={[100, 400]} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "var(--color-card)",
                   border: "1px solid var(--color-border)",
                   borderRadius: "var(--radius)",
                 }}
-                cursor={{ strokeDasharray: "3 3" }}
               />
-              <Scatter data={demoCompletionVsDifficulty} fill={COLORS.tertiary}>
-                {demoCompletionVsDifficulty.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
-                ))}
-              </Scatter>
-            </ScatterChart>
+            </PieChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>

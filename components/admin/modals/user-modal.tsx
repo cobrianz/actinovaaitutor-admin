@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import type { User } from "@/lib/types"
 
 interface UserModalProps {
@@ -26,15 +24,19 @@ interface UserModalProps {
 }
 
 export function UserModal({ open, onOpenChange, user, onSave }: UserModalProps) {
-  const [formData, setFormData] = useState<Partial<User>>(
-    user || {
-      name: "",
-      email: "",
-      role: "student",
-      subscription: "free",
-      status: "active",
-    },
-  )
+  const [formData, setFormData] = useState<Partial<User>>({})
+
+  useEffect(() => {
+    if (user && open) {
+      setFormData(user)
+    } else if (open) {
+      setFormData({
+        name: "",
+        email: "",
+        status: "active",
+      })
+    }
+  }, [user, open])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,80 +46,51 @@ export function UserModal({ open, onOpenChange, user, onSave }: UserModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-gradient">{user ? "Edit User" : "Add New User"}</DialogTitle>
+      <DialogContent className="glass-strong max-w-5xl w-[95vw] overflow-hidden p-0 sm:p-6">
+        <DialogHeader className="px-6 pt-6 sm:px-0 sm:pt-0">
+          <DialogTitle className="text-2xl text-gradient">
+            {user ? "Edit User Account" : "Add New User Account"}
+          </DialogTitle>
           <DialogDescription>
-            {user ? "Update user information and settings." : "Create a new user account."}
+            {user ? "Update user profile and subscription details." : "Create a new administrative user profile."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                value={formData.name}
+                value={formData.name || ""}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="glass"
+                className="glass focus:ring-primary/50"
+                placeholder="Enter full name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
-                value={formData.email}
+                value={formData.email || ""}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="glass"
+                className="glass focus:ring-primary/50"
+                placeholder="email@example.com"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => setFormData({ ...formData, role: value as User["role"] })}
-              >
-                <SelectTrigger className="glass">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="teacher">Teacher</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subscription">Subscription</Label>
-              <Select
-                value={formData.subscription}
-                onValueChange={(value) => setFormData({ ...formData, subscription: value as User["subscription"] })}
-              >
-                <SelectTrigger className="glass">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="basic">Basic</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">Account Status</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData({ ...formData, status: value as User["status"] })}
               >
-                <SelectTrigger className="glass">
-                  <SelectValue />
+                <SelectTrigger className="glass focus:ring-primary/50">
+                  <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Active</SelectItem>
@@ -128,47 +101,9 @@ export function UserModal({ open, onOpenChange, user, onSave }: UserModalProps) 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={formData.location || ""}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="glass"
-                placeholder="City, Country"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={formData.phone || ""}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="glass"
-                placeholder="+1 234 567 8900"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
-            <Textarea
-              id="bio"
-              value={formData.bio || ""}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="glass"
-              rows={3}
-              placeholder="Tell us about yourself..."
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" className="gradient-primary text-primary-foreground">
-              {user ? "Update User" : "Create User"}
+          <DialogFooter className="pt-4 px-6 pb-6 sm:px-0 sm:pb-0">
+            <Button type="submit" className="gradient-primary text-primary-foreground w-full sm:w-auto px-12">
+              {user ? "Save Changes" : "Create User"}
             </Button>
           </DialogFooter>
         </form>

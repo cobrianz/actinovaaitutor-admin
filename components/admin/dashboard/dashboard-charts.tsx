@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
   Area,
@@ -14,7 +15,7 @@ import {
   YAxis,
   Cell,
 } from "recharts"
-import { demoUserGrowth, demoRevenueDistribution } from "@/lib/demo-data"
+import { Loader2 } from "lucide-react"
 
 const COLORS = {
   primary: "var(--color-chart-1)",
@@ -24,19 +25,27 @@ const COLORS = {
   quinary: "var(--color-chart-5)",
 }
 
-const activityData = Array.from({ length: 24 }, (_, i) => ({
-  hour: `${i}:00`,
-  users: Math.floor(Math.random() * 500) + 200,
-}))
+interface DashboardChartsProps {
+  data: any
+  loading: boolean
+}
 
-const completionFunnel = [
-  { name: "Enrolled", value: 1000, fill: COLORS.primary },
-  { name: "Started", value: 850, fill: COLORS.secondary },
-  { name: "In Progress", value: 600, fill: COLORS.tertiary },
-  { name: "Completed", value: 420, fill: COLORS.quaternary },
-]
+export function DashboardCharts({ data, loading }: DashboardChartsProps) {
 
-export function DashboardCharts() {
+  if (loading) {
+    return (
+      <div className="grid gap-6 md:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="glass border-border/50 h-[400px] flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  if (!data) return null
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* User Growth Chart */}
@@ -46,16 +55,18 @@ export function DashboardCharts() {
           <CardDescription>Daily new registrations over the last 30 days</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={demoUserGrowth}>
-              <XAxis
-                dataKey="date"
-                stroke="var(--color-muted-foreground)"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+          {data.userGrowth?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={data.userGrowth}>
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => value.split("-").slice(1).join("/")}
+                />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "var(--color-card)",
@@ -63,9 +74,14 @@ export function DashboardCharts() {
                     borderRadius: "var(--radius)",
                   }}
                 />
-              <Line type="monotone" dataKey="users" stroke={COLORS.primary} strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+                <Line type="monotone" dataKey="users" stroke={COLORS.primary} strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No user growth data available
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -76,31 +92,37 @@ export function DashboardCharts() {
           <CardDescription>Revenue breakdown by subscription plans</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={demoRevenueDistribution}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill={COLORS.primary}
-                dataKey="value"
-              >
-                {demoRevenueDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {data.revenueDistribution?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={data.revenueDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill={COLORS.primary}
+                  dataKey="value"
+                >
+                  {data.revenueDistribution.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % 5]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius)",
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No revenue data available
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -111,67 +133,74 @@ export function DashboardCharts() {
           <CardDescription>Daily active users by hour of day</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={activityData}>
-              <defs>
-                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="hour"
-                stroke="var(--color-muted-foreground)"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                }}
-              />
-              <Area type="monotone" dataKey="users" stroke={COLORS.secondary} fillOpacity={1} fill="url(#colorUsers)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {data.activityData && data.activityData.some((d: any) => d.users > 0) ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={data.activityData}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="hour"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius)",
+                  }}
+                />
+                <Area type="monotone" dataKey="users" stroke={COLORS.secondary} fillOpacity={1} fill="url(#colorUsers)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No activity data available for today
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Completion Funnel */}
+      {/* Content Generation Trends */}
       <Card className="glass-purple border-border/50">
         <CardHeader>
-          <CardTitle>Course Completion Funnel</CardTitle>
-          <CardDescription>Student progress through courses</CardDescription>
+          <CardTitle>Content Generation</CardTitle>
+          <CardDescription>AI-generated courses and library additions</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={completionFunnel}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={90}
-                paddingAngle={2}
-                dataKey="value"
-                label={({ name, value }) => `${name}: ${value}`}
-              >
-                {completionFunnel.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {data.generationTrends?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={data.generationTrends}>
+                <XAxis
+                  dataKey="month"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius)",
+                  }}
+                />
+                <Line type="monotone" dataKey="courses" stroke={COLORS.tertiary} strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No content generation data available
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
   Area,
@@ -17,6 +18,7 @@ import {
   Cell,
   ZAxis,
 } from "recharts"
+import { Loader2 } from "lucide-react"
 
 const COLORS = {
   primary: "var(--color-chart-1)",
@@ -25,31 +27,54 @@ const COLORS = {
   quaternary: "var(--color-chart-4)",
 }
 
-const creationTrends = Array.from({ length: 12 }, (_, i) => ({
-  month: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i],
-  sets: Math.floor(Math.random() * 30) + 15,
-}))
-
-const topicPopularity = [
-  { name: "Programming", value: 35 },
-  { name: "Web Dev", value: 25 },
-  { name: "Data Science", value: 20 },
-  { name: "Database", value: 12 },
-  { name: "AI/ML", value: 8 },
-]
-
-const studyDuration = Array.from({ length: 30 }, (_, i) => ({
-  day: i + 1,
-  minutes: Math.floor(Math.random() * 40) + 20,
-}))
-
-const performanceByDifficulty = [
-  { difficulty: "Easy", performance: 85, sessions: 450 },
-  { difficulty: "Medium", performance: 72, sessions: 380 },
-  { difficulty: "Hard", performance: 58, sessions: 220 },
-]
-
 export function FlashcardAnalytics() {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch("/api/analytics?range=30d")
+        const result = await response.json()
+        if (result.analytics) {
+          setData(result.analytics.charts)
+        }
+      } catch (error) {
+        console.error("Failed to fetch flashcard analytics:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAnalytics()
+  }, [])
+
+  if (loading) {
+    return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+  }
+
+  if (!data) return null
+
+  // Transform data for charts
+  const creationTrends = data.generationTrends.map((t: any) => ({
+    month: t.month.split(" ")[0],
+    sets: t.courses // actually flashcard sets
+  }))
+
+  const topicPopularity = data.topTopics || []
+
+  // Mocking study duration as we don't track it yet
+  const studyDuration = Array.from({ length: 30 }, (_, i) => ({
+    day: i + 1,
+    minutes: Math.floor(Math.random() * 40) + 20,
+  }))
+
+  // Using difficulty distribution for performance chart 
+  const performanceByDifficulty = (data.difficultyDistribution || []).map((d: any) => ({
+    difficulty: d.name,
+    performance: d.name === "Beginner" ? 85 : d.name === "Intermediate" ? 72 : 58, // Mock perf
+    sessions: d.value * 10 // Mock sessions
+  }))
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card className="glass border-border/50">
@@ -105,8 +130,8 @@ export function FlashcardAnalytics() {
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
-                {topicPopularity.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
+                {topicPopularity.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % 4]} />
                 ))}
               </Pie>
               <Tooltip
@@ -152,8 +177,8 @@ export function FlashcardAnalytics() {
 
       <Card className="glass border-border/50">
         <CardHeader>
-          <CardTitle>Performance by Difficulty</CardTitle>
-          <CardDescription>Success rate vs difficulty</CardDescription>
+          <CardTitle>Difficulty Distribution</CardTitle>
+          <CardDescription>Volume by difficulty</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
@@ -164,6 +189,7 @@ export function FlashcardAnalytics() {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
+                name="Sessions"
               />
               <YAxis
                 dataKey="performance"
@@ -171,18 +197,26 @@ export function FlashcardAnalytics() {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
+                name="Performance"
               />
               <ZAxis range={[100, 400]} />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
+                cursor={{ strokeDasharray: '3 3' }}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="glass p-2 border border-border/50 rounded shadow-sm">
+                        <p className="font-semibold">{payload[0].payload.difficulty}</p>
+                        <p className="text-xs">Est. Sessions: {payload[0].value}</p>
+                      </div>
+                    );
+                  }
+                  return null;
                 }}
               />
               <Scatter data={performanceByDifficulty} fill={COLORS.tertiary}>
-                {performanceByDifficulty.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
+                {performanceByDifficulty.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % 4]} />
                 ))}
               </Scatter>
             </ScatterChart>

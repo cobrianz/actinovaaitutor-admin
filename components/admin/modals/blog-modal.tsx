@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -16,30 +16,45 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { BlogPost } from "@/lib/types"
-
 interface BlogModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  blog?: BlogPost | null
-  onSave: (blog: Partial<BlogPost>) => void
+  blog?: any | null
+  onSave: (blog: Partial<any>) => void
 }
 
 export function BlogModal({ open, onOpenChange, blog, onSave }: BlogModalProps) {
-  const [formData, setFormData] = useState<Partial<BlogPost>>(
-    blog || {
-      title: "",
-      author: "",
-      category: "",
-      status: "draft",
-      tags: [],
-    },
-  )
+  const [formData, setFormData] = useState<Partial<any>>({})
+
+  useEffect(() => {
+    if (open) {
+      setFormData(blog ? {
+        title: blog.title || "",
+        authorName: typeof blog.author === 'string' ? blog.author : blog.author?.name || "",
+        category: blog.category || "",
+        status: blog.status || "draft",
+        summary: blog.summary || blog.excerpt || "",
+        content: blog.content || "",
+        tags: blog.tags || [],
+        thumbnailUrl: blog.thumbnailUrl || blog.featuredImage || "",
+        featured: blog.featured || false,
+      } : {
+        title: "",
+        authorName: "Admin",
+        category: "General",
+        status: "draft",
+        summary: "",
+        content: "",
+        tags: [],
+        thumbnailUrl: "",
+        featured: false,
+      })
+    }
+  }, [blog, open])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave(formData)
-    onOpenChange(false)
   }
 
   return (
@@ -54,28 +69,16 @@ export function BlogModal({ open, onOpenChange, blog, onSave }: BlogModalProps) 
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-              className="glass"
-              placeholder="Enter blog post title..."
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="author">Author</Label>
+              <Label htmlFor="title">Title</Label>
               <Input
-                id="author"
-                value={formData.author}
-                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
                 className="glass"
-                placeholder="Author name"
+                placeholder="Enter blog post title..."
               />
             </div>
             <div className="space-y-2">
@@ -91,47 +94,23 @@ export function BlogModal({ open, onOpenChange, blog, onSave }: BlogModalProps) 
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="excerpt">Excerpt</Label>
-            <Textarea
-              id="excerpt"
-              value={formData.excerpt || ""}
-              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-              className="glass"
-              rows={2}
-              placeholder="Brief summary of the post..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="content">Content</Label>
-            <Textarea
-              id="content"
-              value={formData.content || ""}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              required
-              className="glass"
-              rows={6}
-              placeholder="Write your blog post content here..."
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Label htmlFor="authorName">Author Name</Label>
               <Input
-                id="tags"
-                value={formData.tags?.join(", ") || ""}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(",").map((t) => t.trim()) })}
+                id="authorName"
+                value={formData.authorName}
+                onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
+                required
                 className="glass"
-                placeholder="ai, education, learning"
+                placeholder="Author name"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as BlogPost["status"] })}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
               >
                 <SelectTrigger className="glass">
                   <SelectValue />
@@ -146,14 +125,53 @@ export function BlogModal({ open, onOpenChange, blog, onSave }: BlogModalProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="featuredImage">Featured Image URL</Label>
-            <Input
-              id="featuredImage"
-              value={formData.featuredImage || ""}
-              onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
+            <Label htmlFor="summary">Summary / Excerpt</Label>
+            <Textarea
+              id="summary"
+              value={formData.summary}
+              onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
               className="glass"
-              placeholder="https://example.com/image.jpg"
+              rows={2}
+              placeholder="Brief summary of the post..."
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="content">Content</Label>
+            <Textarea
+              id="content"
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              required
+              className="glass"
+              rows={8}
+              placeholder="Write your blog post content here..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Input
+                id="tags"
+                value={formData.tags?.join(", ") || ""}
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(",").map((t) => t.trim()) })}
+                className="glass"
+                placeholder="ai, education, learning"
+              />
+            </div>
+            {!blog && (
+              <div className="space-y-2">
+                <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
+                <Input
+                  id="thumbnailUrl"
+                  value={formData.thumbnailUrl}
+                  onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                  className="glass"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+            )}
           </div>
 
           <DialogFooter>

@@ -1,82 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, Edit, Plus, Trash2 } from "lucide-react"
 import { PlanModal } from "@/components/admin/modals/plan-modal"
-
-const plans = [
-  {
-    id: "1",
-    name: "Free",
-    price: 0,
-    billing: "forever",
-    features: ["5 AI-generated courses", "50 flashcards", "Basic analytics", "Community support", "Mobile app access"],
-    subscribers: 1250,
-    status: "active",
-    color: "purple",
-  },
-  {
-    id: "2",
-    name: "Basic",
-    price: 19.99,
-    billing: "month",
-    features: [
-      "Unlimited AI courses",
-      "500 flashcards",
-      "Advanced analytics",
-      "Email support",
-      "Custom study plans",
-      "Progress tracking",
-    ],
-    subscribers: 890,
-    status: "active",
-    color: "blue",
-  },
-  {
-    id: "3",
-    name: "Pro",
-    price: 39.99,
-    billing: "month",
-    features: [
-      "Everything in Basic",
-      "Unlimited flashcards",
-      "AI tutor chat",
-      "Priority support",
-      "Collaborative learning",
-      "Export certificates",
-      "API access",
-    ],
-    subscribers: 580,
-    status: "active",
-    color: "cyan",
-  },
-  {
-    id: "4",
-    name: "Enterprise",
-    price: 99.99,
-    billing: "month",
-    features: [
-      "Everything in Pro",
-      "Dedicated account manager",
-      "Custom integrations",
-      "SSO & SAML",
-      "Advanced security",
-      "White-label options",
-      "SLA guarantee",
-      "Custom training",
-    ],
-    subscribers: 125,
-    status: "active",
-    color: "green",
-  },
-]
+import { toast } from "sonner"
 
 export function SubscriptionPlans() {
+  const [plans, setPlans] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const fetchPlans = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true)
+      const response = await fetch("/api/billing/plans")
+      const data = await response.json()
+      if (data.plans) {
+        setPlans(data.plans)
+      }
+    } catch (error) {
+      console.error("Failed to fetch plans:", error)
+    } finally {
+      if (!silent) setLoading(false)
+    }
+  }
+
+  // Initial fetch
+  useEffect(() => {
+    fetchPlans()
+  }, [])
+
+  // Refresh when modal closes (in case of updates)
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    fetchPlans(true)
+  }
 
   const handleEdit = (plan: any) => {
     setSelectedPlan(plan)
@@ -86,6 +48,29 @@ export function SubscriptionPlans() {
   const handleAdd = () => {
     setSelectedPlan(null)
     setIsModalOpen(true)
+  }
+  const handleDelete = async (plan: any) => {
+    if (!confirm(`Are you sure you want to delete the ${plan.name} plan?`)) return
+
+    try {
+      const response = await fetch(`/api/billing/plans?id=${plan.id || plan._id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        toast.success("Plan deleted successfully")
+        fetchPlans(true)
+      } else {
+        toast.error("Failed to delete plan")
+      }
+    } catch (error) {
+      console.error("Error deleting plan:", error)
+      toast.error("Error deleting plan")
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8 text-center text-foreground-muted">Loading plans...</div>
   }
 
   return (
@@ -102,24 +87,31 @@ export function SubscriptionPlans() {
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:max-w-6xl">
           {plans.map((plan) => (
-            <Card key={plan.id} className="glass-card border-accent/20 relative overflow-hidden">
-              {plan.name === "Pro" && (
+            <Card key={plan.id} className="glass-card border-accent/20 relative overflow-hidden flex flex-col">
+              {plan.name === "Premium" && (
                 <div className="absolute top-4 right-4">
                   <Badge className="gradient-primary text-white">Popular</Badge>
+                </div>
+              )}
+              {plan.name === "Enterprise" && (
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-blue-600 text-white">Best Value</Badge>
                 </div>
               )}
               <CardHeader>
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <CardDescription>
-                  <span className="text-3xl font-bold text-foreground">${plan.price}</span>
-                  <span className="text-foreground-muted">/{plan.billing}</span>
+                  <span className="text-3xl font-bold text-foreground">
+                    ${plan.price.toLocaleString()}
+                  </span>
+                  {plan.price > 0 && <span className="text-foreground-muted">/{plan.billing}</span>}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {plan.features.map((feature, index) => (
+              <CardContent className="space-y-4 flex-1 flex flex-col">
+                <div className="space-y-2 flex-1">
+                  {plan.features.map((feature: string, index: number) => (
                     <div key={index} className="flex items-start gap-2">
                       <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span className="text-sm text-foreground-muted">{feature}</span>
@@ -127,7 +119,7 @@ export function SubscriptionPlans() {
                   ))}
                 </div>
 
-                <div className="pt-4 border-t border-border">
+                <div className="pt-4 border-t border-border mt-auto">
                   <div className="text-sm text-foreground-muted mb-3">
                     <span className="font-semibold text-foreground">{plan.subscribers}</span> subscribers
                   </div>
@@ -136,7 +128,12 @@ export function SubscriptionPlans() {
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
-                    <Button variant="outline" size="sm" className="text-destructive bg-transparent">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(plan)}
+                      className="text-destructive bg-transparent hover:bg-destructive/10"
+                    >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
@@ -147,7 +144,7 @@ export function SubscriptionPlans() {
         </div>
       </div>
 
-      <PlanModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} plan={selectedPlan} />
+      <PlanModal isOpen={isModalOpen} onClose={handleModalClose} plan={selectedPlan} />
     </>
   )
 }

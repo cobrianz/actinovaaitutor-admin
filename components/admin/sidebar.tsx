@@ -1,4 +1,5 @@
 "use client"
+import { useState, useEffect } from "react"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -40,7 +41,7 @@ const navigation = [
   { name: "Tests", href: "/admin/tests", icon: FileText },
   { name: "Blogs", href: "/admin/blogs", icon: BookMarked },
   { name: "Contacts", href: "/admin/contacts", icon: Mail },
-  { name: "Billing", href: "/admin/billing", icon: DollarSign }, 
+  { name: "Billing", href: "/admin/billing", icon: DollarSign },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Reports", href: "/admin/reports", icon: FileBarChart },
   { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -49,6 +50,26 @@ const navigation = [
 export function Sidebar() {
   const { collapsed, toggleCollapsed, mobileOpen, setMobileOpen } = useSidebar()
   const pathname = usePathname()
+  const [unreadContacts, setUnreadContacts] = useState(0)
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch('/api/contacts?status=new&limit=1')
+        const data = await response.json()
+        if (data.pagination) {
+          setUnreadContacts(data.pagination.total)
+        }
+      } catch (error) {
+        console.error("Failed to fetch unread contacts", error)
+      }
+    }
+
+    fetchUnreadCount()
+    // Poll every minute
+    const interval = setInterval(fetchUnreadCount, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <aside
@@ -63,7 +84,7 @@ export function Sidebar() {
         "sm:max-w-sm"
       )}
     >
-     
+
       {/* Navigation */}
       <nav className="flex-1 space-y-3 px-3 py-6 overflow-y-auto">
         {navigation.map((item) => {
@@ -81,8 +102,24 @@ export function Sidebar() {
               )}
               title={collapsed ? item.name : undefined}
             >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>{item.name}</span>}
+              <div className="relative">
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                {item.name === "Contacts" && unreadContacts > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                    {unreadContacts > 9 ? "9+" : unreadContacts}
+                  </span>
+                )}
+              </div>
+              {!collapsed && (
+                <div className="flex flex-1 items-center justify-between">
+                  <span>{item.name}</span>
+                  {item.name === "Contacts" && unreadContacts > 0 && (
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-100 px-1.5 text-xs font-semibold text-red-600">
+                      {unreadContacts}
+                    </span>
+                  )}
+                </div>
+              )}
             </Link>
           )
         })}

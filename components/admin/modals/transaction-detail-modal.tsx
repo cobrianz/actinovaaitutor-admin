@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Download, Mail, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
 interface TransactionDetailModalProps {
@@ -90,21 +90,17 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Transac
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1 bg-transparent">
-              <Mail className="h-4 w-4 mr-2" />
-              Email Receipt
-            </Button>
-            <Button variant="outline" className="flex-1 bg-transparent">
-              <Download className="h-4 w-4 mr-2" />
-              Download PDF
-            </Button>
+          {/* Actions */}
+          <div className="flex gap-3 justify-end">
             {transaction.status === "failed" && (
-              <Button className="gradient-primary flex-1">
+              <Button className="gradient-primary flex-1 sm:flex-none">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Retry Payment
               </Button>
             )}
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
           </div>
         </div>
       </DialogContent>

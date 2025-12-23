@@ -19,14 +19,34 @@ export function ContactResponseModal({ isOpen, onClose, contact }: ContactRespon
   const [template, setTemplate] = useState("")
 
   const templates = {
-    welcome: "Thank you for contacting us! We'll get back to you within 24 hours.",
-    resolved: "Your issue has been resolved. Please let us know if you need any further assistance.",
-    investigating: "We're currently investigating your issue and will update you shortly.",
+    welcome: "Dear {name},\n\nThank you for reaching out to Actinova AI Tutor. We have received your inquiry regarding \"{subject}\" and our team is currently reviewing the details. You can expect a professional follow-up within 24 hours.\n\nBest regards,\nActinova Support Team",
+    resolved: "Dear {name},\n\nWe are pleased to inform you that your inquiry regarding \"{subject}\" has been successfully resolved. We have addressed the points raised in your message and ensured all systems are performing as expected.\n\nPlease let us know if you require any further assistance.\n\nBest regards,\nActinova Support Team",
+    investigating: "Dear {name},\n\nThank you for your patience. Your inquiry regarding \"{subject}\" is currently under active investigation by our technical team. We are working diligently to provide a comprehensive resolution and will update you as soon as more information becomes available.\n\nBest regards,\nActinova Support Team",
   }
 
-  const handleSubmit = () => {
-    toast.success(`Response sent to ${contact?.name}`)
-    onClose()
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch(`/api/contacts/${contact._id}/respond`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: contact.subject ? `Re: ${contact.subject}` : undefined,
+          message: response
+        }),
+      })
+
+      if (res.ok) {
+        toast.success(`Response sent to ${contact?.name}`)
+        onClose()
+      } else {
+        toast.error("Failed to send response")
+      }
+    } catch (error) {
+      console.error("Error sending response:", error)
+      toast.error("Error sending response")
+    }
   }
 
   if (!contact) return null
@@ -63,7 +83,10 @@ export function ContactResponseModal({ isOpen, onClose, contact }: ContactRespon
               value={template}
               onValueChange={(value) => {
                 setTemplate(value)
-                setResponse(templates[value as keyof typeof templates] || "")
+                let text = templates[value as keyof typeof templates] || ""
+                text = text.replace(/{name}/g, contact.name || "Customer")
+                text = text.replace(/{subject}/g, contact.subject || "your inquiry")
+                setResponse(text)
               }}
             >
               <SelectTrigger className="glass border-border/50">

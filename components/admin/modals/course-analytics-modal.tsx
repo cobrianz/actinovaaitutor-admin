@@ -194,10 +194,10 @@ export function CourseAnalyticsModal({ isOpen, onClose, course }: CourseAnalytic
                     <CardTitle>Module Completion</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {Array.from({ length: course.modules }, (_, i) => (
-                      <div key={i} className="space-y-2">
+                    {(course.modules?.length > 0 ? course.modules : Array.from({ length: 5 })).map((m: any, i: number) => (
+                      <div key={m?.id || i} className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="font-medium">Module {i + 1}</span>
+                          <span className="font-medium">{m?.title || `Module ${i + 1}`}</span>
                           <span className="text-foreground-muted">{Math.floor(Math.random() * 30) + 70}%</span>
                         </div>
                         <div className="h-2 rounded-full bg-background-subtle overflow-hidden">

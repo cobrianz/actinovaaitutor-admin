@@ -1,59 +1,101 @@
 "use client"
 
+import { useState, useEffect } from "react"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, TrendingUp, CreditCard, Users, Percent } from "lucide-react"
 
 export function BillingOverview() {
-  const metrics = [
-    {
-      title: "Total Revenue",
-      value: "$284,560",
-      change: "+18.2%",
-      icon: DollarSign,
-      trend: "up",
-      description: "vs last month",
-    },
-    {
-      title: "Monthly Recurring Revenue",
-      value: "$45,280",
-      change: "+12.5%",
-      icon: TrendingUp,
-      trend: "up",
-      description: "MRR this month",
-    },
-    {
-      title: "Active Subscriptions",
-      value: "2,845",
-      change: "+8.3%",
-      icon: Users,
-      trend: "up",
-      description: "vs last month",
-    },
-    {
-      title: "Successful Transactions",
-      value: "3,924",
-      change: "+15.1%",
-      icon: CreditCard,
-      trend: "up",
-      description: "this month",
-    },
-    {
-      title: "Churn Rate",
-      value: "2.4%",
-      change: "-0.8%",
-      icon: Percent,
-      trend: "down",
-      description: "vs last month",
-    },
-    {
-      title: "Avg Revenue Per User",
-      value: "$158.90",
-      change: "+5.2%",
-      icon: DollarSign,
-      trend: "up",
-      description: "ARPU",
-    },
-  ]
+  const [metrics, setMetrics] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const response = await fetch("/api/analytics?range=30d")
+        const data = await response.json()
+        const analytics = data.analytics
+
+        if (analytics) {
+          const totalRev = analytics.overview.totalRevenue?.monthly || 0
+          const activeSubs = analytics.overview.activeSubscriptions || 0
+
+          // Use more direct values or better estimates based on available data
+          const mrr = totalRev / 1 // Assuming current monthly revenue IS the MRR for now
+
+          // Calculate ARPU accurately
+          const arpu = activeSubs > 0 ? Math.floor(totalRev / activeSubs) : 0
+          const churn = 2.4 // Hardcoded for now until we track churn
+
+          setMetrics([
+            {
+              title: "Total Revenue",
+              value: `KSh ${totalRev.toLocaleString()}`,
+              change: "+12.2%", // Placeholder trend until we process historical revenue
+              icon: DollarSign,
+              trend: "up",
+              description: "vs last month",
+            },
+            {
+              title: "Monthly Recurring Revenue",
+              value: `KSh ${mrr.toLocaleString()}`,
+              change: "+8.5%",
+              icon: TrendingUp,
+              trend: "up",
+              description: "MRR this month",
+            },
+            {
+              title: "Active Subscriptions",
+              value: activeSubs.toLocaleString(),
+              change: "+8.3%",
+              icon: Users,
+              trend: "up",
+              description: "vs last month",
+            },
+            {
+              title: "Successful Transactions",
+              value: (analytics.overview.totalTransactions || 0).toLocaleString(),
+              change: "+15.1%",
+              icon: CreditCard,
+              trend: "up",
+              description: "this month",
+            },
+            {
+              title: "Churn Rate",
+              value: `${churn}%`,
+              change: "-0.8%",
+              icon: Percent,
+              trend: "down",
+              description: "vs last month",
+            },
+            {
+              title: "Avg Revenue Per User",
+              value: `KSh ${arpu.toLocaleString()}`,
+              change: "+5.2%",
+              icon: DollarSign,
+              trend: "up",
+              description: "ARPU",
+            },
+          ])
+        }
+      } catch (error) {
+        console.error("Failed to fetch billing metrics:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMetrics()
+  }, [])
+
+  if (loading) {
+    return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map(i => (
+        <Card key={i} className="glass-card border-accent/20 h-32 animate-pulse">
+          <CardContent className="p-6"></CardContent>
+        </Card>
+      ))}
+    </div>
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

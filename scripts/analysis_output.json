@@ -1,0 +1,1817 @@
+Connected to database: test
+
+--- Analyzing Collection: library ---
+{
+  "_id": "6947f5319fead936c6c15508",
+  "userId": "6947f41d9fead936c6c154ff",
+  "title": "Artificial Intelligence",
+  "topic": "artificial intelligence",
+  "originalTopic": "Artificial Intelligence",
+  "difficulty": "beginner",
+  "format": "course",
+  "level": "beginner",
+  "totalModules": 20,
+  "totalLessons": 100,
+  "modules": [
+    {
+      "id": 1,
+      "title": "Introduction to Artificial Intelligence",
+      "lessons": [
+        {
+          "title": "What is Artificial Intelligence?",
+          "id": "1-1",
+          "content": "# Introduction to Artificial Intelligence  \n## Lesson: What is Artificial Intelligence?  \n\n### Introduction  \nWelcome to the fascinating world of Artificial Intelligence (AI)! In this lesson, we will embark on a journey to understand what AI is, its history, its various types, and its applications in our daily lives. AI is no longer just a concept found in science fiction; it has become an integral part of our technology-driven society. By the end of this lesson, you'll have a foundational understanding of AI and its significance.\n\n### Learning Objectives  \nBy the end of this lesson, you will be able to:  \n1. Define Artificial Intelligence and its key components.  \n2. Recognize the historical milestones in the development of AI.  \n3. Differentiate between types of AI: Narrow AI, General AI, and Superintelligent AI.  \n4. Identify real-world applications of AI.  \n5. Understand the ethical considerations surrounding AI.  \n\n---\n\n### 1. Defining Artificial Intelligence  \nArtificial Intelligence, commonly referred to as AI, is a branch of computer science focused on creating systems that can perform tasks which typically require human intelligence. These tasks include reasoning, learning, problem-solving, perception, and language understanding.\n\n#### Key Components of AI  \n- **Machine Learning (ML)**: A subset of AI that enables systems to learn from data and improve their performance over time without being explicitly programmed.\n- **Natural Language Processing (NLP)**: This allows machines to understand and interpret human language, enabling interactions between humans and computers.\n- **Computer Vision**: This field enables machines to interpret and understand visual information from the world, such as images and videos.\n- **Robotics**: AI in robotics involves creating intelligent machines that can interact with the physical environment.\n\n> \"Artificial Intelligence is the simulation of human intelligence in machines.\"  \n\n### 2. A Brief History of AI  \nUnderstanding the evolution of AI will help you appreciate its current state and potential future. Here are some milestones:  \n\n- **1950**: Alan Turing publishes \"Computing Machinery and Intelligence,\" introducing the Turing Test.\n- **1956**: The Dartmouth Conference, organized by John McCarthy, marks the birth of AI as a field of study.\n- **1960s-1970s**: Development of early AI programs such as ELIZA (a chatbot) and SHRDLU (a natural language understanding program).\n- **1980s**: Introduction of expert systems, which mimic the decision-making ability of a human expert.\n- **1997**: IBM's Deep Blue defeats world chess champion Garry Kasparov.\n- **2010s**: Rise of deep learning, enabling significant advancements in image and speech recognition.\n\n### 3. Types of AI  \nAI can be categorized into three main types based on its capabilities:\n\n#### 3.1. Narrow AI (Weak AI)  \nNarrow AI refers to AI systems designed to perform specific tasks. These systems operate under a limited set of constraints and cannot perform beyond their designated function. Examples include:  \n- **Voice Assistants** (e.g., Siri, Alexa)  \n- **Recommendation Systems** (e.g., Netflix, Amazon)  \n\n#### 3.2. General AI (Strong AI)  \nGeneral AI, still a theoretical concept, refers to systems that possess the ability to understand, learn, and apply intelligence across a wide range of tasks, much like a human. General AI can reason, solve problems, and plan effectively.\n\n#### 3.3. Superintelligent AI  \nSuperintelligent AI surpasses human intelligence and capabilities. This type of AI remains speculative and raises significant ethical concerns regarding control and safety.\n\n### 4. Applications of AI  \nAI has permeated various sectors, transforming industries and enhancing productivity. Here are some notable applications:\n\n- **Healthcare**: AI is used for diagnostics, drug discovery, and personalized medicine. For example, IBM Watson analyzes medical data to assist doctors in making decisions.\n  \n- **Finance**: AI algorithms detect fraudulent transactions in real-time and help in algorithmic trading.\n\n- **Transportation**: Self-driving cars use AI to navigate and make real-time decisions based on environmental data.\n\n- **Entertainment**: AI is behind content recommendations on platforms like Spotify and YouTube.\n\n- **Customer Service**: Chatbots provide 24/7 customer support, answering inquiries and resolving issues.\n\n### 5. Ethical Considerations in AI  \nAs AI continues to evolve, it is crucial to consider its ethical implications. Some key issues include:  \n- **Bias in AI**: AI systems can perpetuate existing biases found in training data, leading to unfair outcomes.\n- **Privacy**: AI technologies can gather and analyze vast amounts of personal data, raising concerns about individual privacy.\n- **Job Displacement**: Automation powered by AI may lead to job losses in certain sectors, necessitating workforce retraining.\n- **Accountability**: Determining liability in cases where AI systems make decisions that result in harm is a complex issue.\n\n### Step-by-Step Example: Building a Simple AI Model  \nTo better understand AI, let’s build a simple machine learning model using Python. This example will demonstrate how a model can learn from data.\n\n#### Prerequisites  \n- Python installed on your machine.  \n- Basic understanding of Python programming.  \n- Libraries: `pandas`, `scikit-learn`. Install them using:  \n```bash\npip install pandas scikit-learn\n```\n\n#### Example: Predicting Iris Species  \nWe will use the famous Iris dataset to build a simple classifier that predicts the species of an iris flower based on its features.\n\n1. **Import Libraries**  \n```python\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score\n```\n\n2. **Load the Dataset**  \n```python\n# Load Iris dataset from sklearn\nfrom sklearn.datasets import load_iris\niris = load_iris()\ndata = pd.DataFrame(data=iris.data, columns=iris.feature_names)\ndata['species'] = iris.target\n```\n\n3. **Prepare Data**  \n```python\n# Split the data into features and target variable\nX = data[iris.feature_names]\ny = data['species']\n\n# Split the data into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n```\n\n4. **Train the Model**  \n```python\n# Initialize the Random Forest Classifier\nmodel = RandomForestClassifier()\n\n# Train the model\nmodel.fit(X_train, y_train)\n```\n\n5. **Make Predictions**  \n```python\n# Make predictions on the test set\ny_pred = model.predict(X_test)\n```\n\n6. **Evaluate the Model**  \n```python\n# Calculate accuracy\naccuracy = accuracy_score(y_test, y_pred)\nprint(f'Accuracy: {accuracy * 100:.2f}%')\n```\n\n### Practice Exercises  \nHere are some exercises to reinforce your understanding:  \n\n1. **Research Task**: Write a brief report on a recent AI application in healthcare or finance.  \n2. **Hands-On Task**: Modify the example code to use a different classifier (e.g., Decision Tree) and evaluate its performance.  \n3. **Discussion**: Consider the ethical implications of AI in one of the industries discussed. What are potential solutions to these ethical issues?  \n\n### Key Takeaways  \n- **AI Definition**: AI involves creating systems capable of performing tasks that require human intelligence.\n- **Types of AI**: Narrow AI is widely used today, while General and Superintelligent AI are still developing concepts.\n- **Applications**: AI is present in numerous fields, including healthcare, finance, transportation, and more.\n- **Ethical Challenges**: AI poses challenges like bias, privacy concerns, job displacement, and accountability.\n\n### Conclusion  \nCongratulations on completing this introductory lesson on Artificial Intelligence! You should now have a solid understanding of what AI is, its types, applications, and the ethical considerations that come with it. AI is an ever-evolving field with tremendous potential, and you are now equipped to explore it further. Keep learning and stay curious!  \n\n---  \n*This lesson was designed to provide a foundational overview of Artificial Intelligence for beginners. For further reading, consider exploring more advanced topics and current research in AI.*",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "History of AI",
+          "id": "1-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Applications of AI in Everyday Life",
+          "id": "1-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Understanding Machine Learning vs. AI",
+          "id": "1-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "The Future of AI",
+          "id": "1-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Fundamentals of Machine Learning",
+      "lessons": [
+        {
+          "title": "What is Machine Learning?",
+          "id": "2-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Types of Machine Learning",
+          "id": "2-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Supervised vs. Unsupervised Learning",
+          "id": "2-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Introduction to Neural Networks",
+          "id": "2-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Basic Concepts of Training and Testing",
+          "id": "2-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Data Collection and Preparation",
+      "lessons": [
+        {
+          "title": "Importance of Data in AI",
+          "id": "3-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Methods of Data Collection",
+          "id": "3-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Data Cleaning Techniques",
+          "id": "3-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Understanding Data Formats",
+          "id": "3-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        },
+        {
+          "title": "Exploratory Data Analysis",
+          "id": "3-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.431Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Understanding Algorithms",
+      "lessons": [
+        {
+          "title": "What is an Algorithm?",
+          "id": "4-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Common Algorithms in AI",
+          "id": "4-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Algorithm Efficiency and Complexity",
+          "id": "4-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Evaluating Algorithm Performance",
+          "id": "4-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Introduction to Optimization",
+          "id": "4-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Introduction to Deep Learning",
+      "lessons": [
+        {
+          "title": "What is Deep Learning?",
+          "id": "5-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Neural Networks Explained",
+          "id": "5-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Convolutional Neural Networks (CNNs)",
+          "id": "5-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Recurrent Neural Networks (RNNs)",
+          "id": "5-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Applications of Deep Learning",
+          "id": "5-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Natural Language Processing (NLP)",
+      "lessons": [
+        {
+          "title": "What is NLP?",
+          "id": "6-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Text Processing Techniques",
+          "id": "6-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Sentiment Analysis",
+          "id": "6-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Chatbots and Conversational AI",
+          "id": "6-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Challenges in NLP",
+          "id": "6-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Computer Vision Basics",
+      "lessons": [
+        {
+          "title": "What is Computer Vision?",
+          "id": "7-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Image Processing Techniques",
+          "id": "7-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Object Detection and Recognition",
+          "id": "7-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Facial Recognition Technology",
+          "id": "7-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Applications of Computer Vision",
+          "id": "7-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Robotics and AI",
+      "lessons": [
+        {
+          "title": "Introduction to Robotics",
+          "id": "8-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI in Robotics",
+          "id": "8-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Robot Learning Techniques",
+          "id": "8-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Autonomous Vehicles",
+          "id": "8-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Ethics in Robotics",
+          "id": "8-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "AI in Healthcare",
+      "lessons": [
+        {
+          "title": "Applications of AI in Medicine",
+          "id": "9-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Predictive Analytics in Healthcare",
+          "id": "9-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI for Medical Imaging",
+          "id": "9-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Personalized Medicine and AI",
+          "id": "9-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Ethical Considerations in AI Healthcare",
+          "id": "9-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "AI in Business",
+      "lessons": [
+        {
+          "title": "AI for Business Decision Making",
+          "id": "10-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Customer Service Automation",
+          "id": "10-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Predictive Analytics in Marketing",
+          "id": "10-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI in Supply Chain Management",
+          "id": "10-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Case Studies of AI in Business",
+          "id": "10-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "AI and Society",
+      "lessons": [
+        {
+          "title": "Impact of AI on Employment",
+          "id": "11-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI in Everyday Life",
+          "id": "11-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Privacy Concerns with AI",
+          "id": "11-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Regulations and Policies on AI",
+          "id": "11-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Future Societal Challenges with AI",
+          "id": "11-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Programming for AI",
+      "lessons": [
+        {
+          "title": "Introduction to Python for AI",
+          "id": "12-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Libraries for AI: NumPy, Pandas, Matplotlib",
+          "id": "12-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Introduction to TensorFlow and Keras",
+          "id": "12-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Building Your First AI Model",
+          "id": "12-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Debugging and Testing Your Code",
+          "id": "12-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "AI Ethics and Responsibility",
+      "lessons": [
+        {
+          "title": "Understanding AI Ethics",
+          "id": "13-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Bias in AI Systems",
+          "id": "13-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Accountability in AI",
+          "id": "13-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Ethical AI Frameworks",
+          "id": "13-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Case Studies of Ethical Dilemmas",
+          "id": "13-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "AI Tools and Platforms",
+      "lessons": [
+        {
+          "title": "Overview of AI Development Tools",
+          "id": "14-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Cloud Platforms for AI",
+          "id": "14-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Open Source AI Tools",
+          "id": "14-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI Frameworks Comparison",
+          "id": "14-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Future Trends in AI Tools",
+          "id": "14-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "AI and Creativity",
+      "lessons": [
+        {
+          "title": "AI in Art and Design",
+          "id": "15-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Music Generation with AI",
+          "id": "15-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Writing Assistance through AI",
+          "id": "15-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI in Game Development",
+          "id": "15-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Collaborating with AI Creatively",
+          "id": "15-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "AI in Education",
+      "lessons": [
+        {
+          "title": "Personalized Learning with AI",
+          "id": "16-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "AI in Educational Tools",
+          "id": "16-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Tutoring Systems Using AI",
+          "id": "16-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Challenges of AI in Education",
+          "id": "16-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Future of AI in Learning Environments",
+          "id": "16-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "title": "AI in Finance",
+      "lessons": [
+        {
+          "title": "AI for Risk Management",
+          "id": "17-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Fraud Detection Techniques",
+          "id": "17-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Algorithmic Trading Basics",
+          "id": "17-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Customer Insights through AI",
+          "id": "17-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Future of AI in Finance",
+          "id": "17-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "AI Challenges and Limitations",
+      "lessons": [
+        {
+          "title": "Current Limitations of AI",
+          "id": "18-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Common Misconceptions about AI",
+          "id": "18-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Challenges in AI Development",
+          "id": "18-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Understanding AI Failures",
+          "id": "18-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Future Challenges for AI",
+          "id": "18-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "title": "Getting Started with AI Projects",
+      "lessons": [
+        {
+          "title": "Choosing Your First AI Project",
+          "id": "19-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Planning Your AI Project",
+          "id": "19-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Collaborating with Others in AI",
+          "id": "19-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Documenting Your Work",
+          "id": "19-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Presenting Your AI Project",
+          "id": "19-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Conclusion and Future Learning Paths",
+      "lessons": [
+        {
+          "title": "Recap of Key Concepts",
+          "id": "20-1",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Further Learning Resources",
+          "id": "20-2",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Communities and Networks in AI",
+          "id": "20-3",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Career Opportunities in AI",
+          "id": "20-4",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        },
+        {
+          "title": "Final Thoughts on AI",
+          "id": "20-5",
+          "content": "",
+          "completed": false,
+          "srs": {
+            "interval": 1,
+            "repetitions": 0,
+            "ease": 2.5,
+            "dueDate": "2025-12-21T17:25:02.432Z"
+          }
+        }
+      ]
+    }
+  ],
+  "isPremium": true,
+  "progress": 0,
+  "completed": false,
+  "pinned": false,
+  "createdAt": "2025-12-21T13:25:05.660Z",
+  "lastAccessed": "2025-12-21T17:26:18.669Z",
+  "lastGenerated": "2025-12-21T17:26:11.635Z",
+  "conversation": [
+    {
+      "type": "ai",
+      "message": "Hi! I'm your AI tutor. I'm here to help you understand the concepts better. Feel free to ask me any questions about the lesson!",
+      "timestamp": "2025-12-22T08:39:38.344Z"
+    },
+    {
+      "type": "user",
+      "message": "What is ai",
+      "timestamp": "2025-12-22T08:40:44.565Z"
+    },
+    {
+      "type": "ai",
+      "message": "<strong class=\"font-bold text-gray-900 dark:text-gray-100\">Artificial Intelligence (AI)</strong> is a branch of <strong class=\"font-bold text-gray-900 dark:text-gray-100\">computer science</strong> focused on creating systems that can perform tasks typically requiring <strong class=\"font-bold text-gray-900 dark:text-gray-100\">human intelligence</strong>, such as <strong class=\"font-bold text-gray-900 dark:text-gray-100\">reasoning</strong>, <strong class=\"font-bold text-gray-900 dark:text-gray-100\">learning</strong>, <strong class=\"font-bold text-gray-900 dark:text-gray-100\">problem-solving</strong>, <strong class=\"font-bold text-gray-900 dark:text-gray-100\">perception</strong>, and <strong class=\"font-bold text-gray-900 dark:text-gray-100\">language understanding</strong>.",
+      "html": true,
+      "timestamp": "2025-12-22T08:40:49.366Z"
+    }
+  ],
+  "lastConversationUpdate": "2025-12-22T08:40:49.377Z"
+}
+
+--- Analyzing Collection: explore_category_courses ---
+{
+  "_id": "6948221adbf57a23d0b10cc0",
+  "category": "Creative",
+  "courses": [
+    {
+      "title": "Creative Fundamentals",
+      "description": "Master creative fundamentals with hands-on projects, real-world case studies, and expert mentorship. Join thousands of learners transforming their careers in 2025.",
+      "difficulty": "beginner",
+      "estimatedDuration": "6 weeks",
+      "tags": [
+        "creative",
+        "2025",
+        "career",
+        "hands-on"
+      ],
+      "instructor": "Sarah Chen",
+      "rating": 4.5,
+      "students": 2571,
+      "price": 79,
+      "isPremium": true,
+      "thumbnail": "/placeholder.svg?height=240&width=360",
+      "modules": [
+        {
+          "title": "Week 1: Foundations",
+          "lessons": [
+            "Welcome",
+            "Tools Setup",
+            "First Steps"
+          ]
+        },
+        {
+          "title": "Week 2-3: Core Skills",
+          "lessons": [
+            "Deep Dive",
+            "Patterns",
+            "Best Practices"
+          ]
+        },
+        {
+          "title": "Week 4-5: Real Projects",
+          "lessons": [
+            "Build Project 1",
+            "Build Project 2",
+            "Debugging"
+          ]
+        },
+        {
+          "title": "Final Week: Launch",
+          "lessons": [
+            "Polish & Deploy",
+            "Get Hired",
+            "Next Steps"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Advanced Creative Techniques",
+      "description": "Master advanced creative techniques with hands-on projects, real-world case studies, and expert mentorship. Join thousands of learners transforming their careers in 2025.",
+      "difficulty": "beginner",
+      "estimatedDuration": "7 weeks",
+      "tags": [
+        "creative",
+        "2025",
+        "career",
+        "hands-on"
+      ],
+      "instructor": "Mike Torres",
+      "rating": 4.6,
+      "students": 1057,
+      "price": 99,
+      "isPremium": false,
+      "thumbnail": "/placeholder.svg?height=240&width=360",
+      "modules": [
+        {
+          "title": "Week 1: Foundations",
+          "lessons": [
+            "Welcome",
+            "Tools Setup",
+            "First Steps"
+          ]
+        },
+        {
+          "title": "Week 2-3: Core Skills",
+          "lessons": [
+            "Deep Dive",
+            "Patterns",
+            "Best Practices"
+          ]
+        },
+        {
+          "title": "Week 4-5: Real Projects",
+          "lessons": [
+            "Build Project 1",
+            "Build Project 2",
+            "Debugging"
+          ]
+        },
+        {
+          "title": "Final Week: Launch",
+          "lessons": [
+            "Polish & Deploy",
+            "Get Hired",
+            "Next Steps"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Creative Masterclass 2025",
+      "description": "Master creative masterclass 2025 with hands-on projects, real-world case studies, and expert mentorship. Join thousands of learners transforming their careers in 2025.",
+      "difficulty": "beginner",
+      "estimatedDuration": "8 weeks",
+      "tags": [
+        "creative",
+        "2025",
+        "career",
+        "hands-on"
+      ],
+      "instructor": "Emma Li",
+      "rating": 4.7,
+      "students": 1247,
+      "price": 119,
+      "isPremium": true,
+      "thumbnail": "/placeholder.svg?height=240&width=360",
+      "modules": [
+        {
+          "title": "Week 1: Foundations",
+          "lessons": [
+            "Welcome",
+            "Tools Setup",
+            "First Steps"
+          ]
+        },
+        {
+          "title": "Week 2-3: Core Skills",
+          "lessons": [
+            "Deep Dive",
+            "Patterns",
+            "Best Practices"
+          ]
+        },
+        {
+          "title": "Week 4-5: Real Projects",
+          "lessons": [
+            "Build Project 1",
+            "Build Project 2",
+            "Debugging"
+          ]
+        },
+        {
+          "title": "Final Week: Launch",
+          "lessons": [
+            "Polish & Deploy",
+            "Get Hired",
+            "Next Steps"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Practical Creative Projects",
+      "description": "Master practical creative projects with hands-on projects, real-world case studies, and expert mentorship. Join thousands of learners transforming their careers in 2025.",
+      "difficulty": "intermediate",
+      "estimatedDuration": "9 weeks",
+      "tags": [
+        "creative",
+        "2025",
+        "career",
+        "hands-on"
+      ],
+      "instructor": "Alex Kim",
+      "rating": 4.4,
+      "students": 4376,
+      "price": 139,
+      "isPremium": false,
+      "thumbnail": "/placeholder.svg?height=240&width=360",
+      "modules": [
+        {
+          "title": "Week 1: Foundations",
+          "lessons": [
+            "Welcome",
+            "Tools Setup",
+            "First Steps"
+          ]
+        },
+        {
+          "title": "Week 2-3: Core Skills",
+          "lessons": [
+            "Deep Dive",
+            "Patterns",
+            "Best Practices"
+          ]
+        },
+        {
+          "title": "Week 4-5: Real Projects",
+          "lessons": [
+            "Build Project 1",
+            "Build Project 2",
+            "Debugging"
+          ]
+        },
+        {
+          "title": "Final Week: Launch",
+          "lessons": [
+            "Polish & Deploy",
+            "Get Hired",
+            "Next Steps"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Creative for Career Switchers",
+      "description": "Master creative for career switchers with hands-on projects, real-world case studies, and expert mentorship. Join thousands of learners transforming their careers in 2025.",
+      "difficulty": "intermediate",
+      "estimatedDuration": "10 weeks",
+      "tags": [
+        "creative",
+        "2025",
+        "career",
+        "hands-on"
+      ],
+      "instructor": "David Park",
+      "rating": 4.6,
+      "students": 4645,
+      "price": 159,
+      "isPremium": true,
+      "thumbnail": "/placeholder.svg?height=240&width=360",
+      "modules": [
+        {
+          "title": "Week 1: Foundations",
+          "lessons": [
+            "Welcome",
+            "Tools Setup",
+            "First Steps"
+          ]
+        },
+        {
+          "title": "Week 2-3: Core Skills",
+          "lessons": [
+            "Deep Dive",
+            "Patterns",
+            "Best Practices"
+          ]
+        },
+        {
+          "title": "Week 4-5: Real Projects",
+          "lessons": [
+            "Build Project 1",
+            "Build Project 2",
+            "Debugging"
+          ]
+        },
+        {
+          "title": "Final Week: Launch",
+          "lessons": [
+            "Polish & Deploy",
+            "Get Hired",
+            "Next Steps"
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2025-12-21T16:36:42.140Z",
+  "generatedBy": "gpt-4o-mini"
+}
+
+--- Analyzing Collection: explore_trending ---
+{
+  "_id": "6947f4be9fead936c6c15507",
+  "topics": [
+    {
+      "title": "AI-Powered Business Breakthroughs",
+      "description": "Unlock the potential of AI to elevate your business strategies! From automating customer service to predicting market trends, this course equips you with the tools to leverage AI for maximum ROI.",
+      "category": "Business & Entrepreneurship",
+      "difficulty": "Intermediate",
+      "duration": "8 weeks",
+      "tags": [
+        "AI",
+        "Business",
+        "Automation",
+        "ROI"
+      ],
+      "whyTrending": "Businesses are racing to integrate AI into their operations, creating a massive demand for professionals who can navigate this new landscape.",
+      "learnerQuestions": [
+        {
+          "question": "Do I need a technical background to take this course?",
+          "answer": "No prior technical experience is required. We start with the basics and build your understanding step by step."
+        },
+        {
+          "question": "Will this course help me in my current job?",
+          "answer": "Absolutely! You'll learn practical applications of AI that can be implemented in various business roles."
+        },
+        {
+          "question": "What tools will I learn to use?",
+          "answer": "You'll get hands-on experience with popular AI tools and platforms, including chatbots and data analytics software."
+        }
+      ],
+      "hook": "Transform your business landscape with AI in just 8 weeks!"
+    },
+    {
+      "title": "Holistic Health Mastery: Mind & Body Connection",
+      "description": "Discover how to achieve optimal health by integrating nutrition, mental wellness, and fitness into a balanced lifestyle. This course offers practical techniques and mindfulness practices to transform your well-being.",
+      "category": "Health & Wellness",
+      "difficulty": "Beginner",
+      "duration": "6 weeks",
+      "tags": [
+        "Health",
+        "Wellness",
+        "Nutrition",
+        "Fitness"
+      ],
+      "whyTrending": "The global focus on mental health and overall well-being makes this course essential for anyone looking to enhance their lifestyle sustainably.",
+      "learnerQuestions": [
+        {
+          "question": "Is this course suitable for beginners?",
+          "answer": "Yes! This course is designed for anyone looking to improve their health, regardless of their starting point."
+        },
+        {
+          "question": "What kind of changes can I expect in my life?",
+          "answer": "You'll develop healthier habits, improve your physical fitness, and gain tools for better mental health."
+        },
+        {
+          "question": "Will I receive resources for ongoing learning?",
+          "answer": "Yes! You'll receive a wealth of resources, including meal plans, workout guides, and mindfulness exercises."
+        }
+      ],
+      "hook": "Achieve a balanced, healthy life in just 6 weeks!"
+    },
+    {
+      "title": "The Art of Storytelling in Business",
+      "description": "Master the craft of storytelling to captivate your audience and elevate your brand. Learn how to weave compelling narratives that resonate and drive results in your marketing and presentations.",
+      "category": "Creative Arts",
+      "difficulty": "Beginner to Intermediate",
+      "duration": "5 weeks",
+      "tags": [
+        "Storytelling",
+        "Marketing",
+        "Branding",
+        "Communication"
+      ],
+      "whyTrending": "With attention spans dwindling, effective storytelling is becoming a vital skill for marketers and entrepreneurs alike.",
+      "learnerQuestions": [
+        {
+          "question": "How will this course benefit my marketing efforts?",
+          "answer": "You'll learn how to create engaging stories that differentiate your brand and connect with your target audience."
+        },
+        {
+          "question": "Do I need to be a writer to take this course?",
+          "answer": "Not at all! This course is designed for anyone looking to improve their communication skills through storytelling."
+        },
+        {
+          "question": "What types of stories will we focus on?",
+          "answer": "We’ll explore brand stories, customer testimonials, and personal narratives that can enhance your marketing strategies."
+        }
+      ],
+      "hook": "Captivate and convert with powerful storytelling in just 5 weeks!"
+    },
+    {
+      "title": "DIY Sustainable Living: Eco-Friendly Crafts",
+      "description": "Join the movement towards sustainability by learning how to create beautiful, eco-friendly crafts for your home and lifestyle. This course covers everything from upcycling to natural materials.",
+      "category": "Lifestyle",
+      "difficulty": "Beginner",
+      "duration": "4 weeks",
+      "tags": [
+        "Sustainability",
+        "Crafts",
+        "DIY",
+        "Eco-Friendly"
+      ],
+      "whyTrending": "As more people become environmentally conscious, sustainable living practices are gaining popularity, making this course not only trendy but essential.",
+      "learnerQuestions": [
+        {
+          "question": "What supplies will I need for the projects?",
+          "answer": "A basic list of materials will be provided at the start, focusing on easily accessible and sustainable items."
+        },
+        {
+          "question": "Can I do this course without any crafting experience?",
+          "answer": "Absolutely! The course is designed for all skill levels, with step-by-step instructions."
+        },
+        {
+          "question": "Will I be able to share my work with others?",
+          "answer": "Yes! You'll have opportunities to showcase your projects in our online community."
+        }
+      ],
+      "hook": "Transform your space and the planet with crafting in 4 weeks!"
+    },
+    {
+      "title": "Mastering Digital Marketing Analytics",
+      "description": "Dive deep into the world of digital marketing analytics! Learn how to interpret data and make data-driven decisions that amplify your marketing efforts and boost your ROI.",
+      "category": "Business & Entrepreneurship",
+      "difficulty": "Intermediate",
+      "duration": "7 weeks",
+      "tags": [
+        "Analytics",
+        "Digital Marketing",
+        "Data-Driven",
+        "ROI"
+      ],
+      "whyTrending": "As digital marketing continues to evolve, businesses are increasingly relying on analytics to drive decision-making, creating a high demand for skilled professionals.",
+      "learnerQuestions": [
+        {
+          "question": "What analytics tools will I learn to use?",
+          "answer": "You'll gain hands-on experience with Google Analytics, SEMrush, and social media analytics platforms."
+        },
+        {
+          "question": "Do I need previous marketing experience?",
+          "answer": "A basic understanding of marketing concepts will help, but the course is structured to guide you from fundamental to advanced levels."
+        },
+        {
+          "question": "How will this course impact my career?",
+          "answer": "You'll enhance your marketability by acquiring in-demand skills that employers are actively seeking."
+        }
+      ],
+      "hook": "Become the analytics expert every business needs in 7 weeks!"
+    },
+    {
+      "title": "Mindful Leadership: Leading with Purpose",
+      "description": "Transform your leadership style by incorporating mindfulness practices. Learn how to become a leader who inspires, engages, and empowers teams while achieving organizational goals.",
+      "category": "Professional Skills",
+      "difficulty": "Intermediate",
+      "duration": "6 weeks",
+      "tags": [
+        "Leadership",
+        "Mindfulness",
+        "Team Building",
+        "Empowerment"
+      ],
+      "whyTrending": "With rising stress levels in the workplace, mindful leadership is emerging as a vital skill to foster well-being and productivity among teams.",
+      "learnerQuestions": [
+        {
+          "question": "What is mindful leadership?",
+          "answer": "Mindful leadership focuses on self-awareness and presence, enabling leaders to make more thoughtful decisions and foster healthier work environments."
+        },
+        {
+          "question": "Can this course help if I’m not in a formal leadership position?",
+          "answer": "Yes! The principles of mindful leadership can be applied to any role, enhancing your personal and professional interactions."
+        },
+        {
+          "question": "What will I learn to improve my leadership skills?",
+          "answer": "You'll learn techniques in emotional intelligence, communication, and conflict resolution that are essential for effective leadership."
+        }
+      ],
+      "hook": "Become a transformative leader who inspires change in just 6 weeks!"
+    }
+  ],
+  "createdAt": "2025-12-21T13:23:10.649Z",
+  "generatedForUser": "anonymous",
+  "model": "gpt-4o-mini"
+}

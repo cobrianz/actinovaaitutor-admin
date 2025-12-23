@@ -1,71 +1,135 @@
 import { NextResponse } from "next/server"
-import type { Blog } from "@/lib/types"
+import { connectToDatabase } from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
 
-const generateDemoBlogs = (): Blog[] => {
-  return Array.from({ length: 30 }, (_, i) => ({
-    _id: `blog-${i + 1}`,
-    title: `Blog Post ${i + 1}: Exploring New Horizons in ${["AI", "Education", "Technology", "Learning"][i % 4]}`,
-    content: "Full blog content would go here with rich text formatting...",
-    excerpt: "A brief summary of this insightful blog post covering important topics.",
-    author: ["John Doe", "Jane Smith", "Alex Johnson", "Sarah Williams"][i % 4],
-    category: ["Technology", "Education", "AI", "Learning"][i % 4],
-    tags: [`tag-${(i % 10) + 1}`, `topic-${(i % 5) + 1}`],
-    thumbnail: `/placeholder.svg?height=300&width=500&query=blog-${i}`,
-    status: ["published", "draft", "scheduled"][i % 3] as any,
-    publishDate: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: {
-      views: Math.floor(Math.random() * 5000) + 500,
-      likes: Math.floor(Math.random() * 500) + 50,
-      comments: Math.floor(Math.random() * 100) + 10,
-      shares: Math.floor(Math.random() * 200) + 20,
-    },
-    seo: {
-      metaTitle: `SEO Title for Blog ${i + 1}`,
-      metaDescription: "SEO optimized description",
-      keywords: ["keyword1", "keyword2"],
-    },
-    createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-  }))
-}
-
+// GET /api/blogs - Get all blog posts
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const search = searchParams.get("search") || ""
   const status = searchParams.get("status") || "all"
-  const category = searchParams.get("category") || "all"
+  const featured = searchParams.get("featured") || "all"
   const page = Number.parseInt(searchParams.get("page") || "1")
   const limit = Number.parseInt(searchParams.get("limit") || "10")
 
-  let blogs = generateDemoBlogs()
+  try {
+    const { db } = await connectToDatabase()
 
-  if (search) {
-    blogs = blogs.filter((b) => b.title.toLowerCase().includes(search.toLowerCase()))
-  }
-  if (status !== "all") {
-    blogs = blogs.filter((b) => b.status === status)
-  }
-  if (category !== "all") {
-    blogs = blogs.filter((b) => b.category === category)
-  }
+    // Build query
+    const query: any = {}
 
-  const total = blogs.length
-  const paginatedBlogs = blogs.slice((page - 1) * limit, page * limit)
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { summary: { $regex: search, $options: "i" } },
+        { tags: { $in: [new RegExp(search, "i")] } },
+      ]
+    }
 
-  return NextResponse.json({
-    blogs: paginatedBlogs,
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  })
+    if (status !== "all") {
+      query.status = status
+    }
+
+    if (featured === "true") {
+      query.featured = true
+    } else if (featured === "false") {
+      query.featured = false
+    }
+
+    // Get total count
+    const total = await db.collection("posts").countDocuments(query)
+
+    // Get paginated results
+    const posts = await db.collection("posts")
+      .find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray()
+
+    // Format response
+    const formattedPosts = posts.map(post => ({
+      _id: post._id.toString(),
+      title: post.title,
+      slug: post.slug,
+      summary: post.summary,
+      content: post.content,
+      excerpt: post.summary,
+      author: post.author?.name || "Unknown Author",
+      category: post.category || "General",
+      tags: post.tags || [],
+      thumbnailUrl: post.thumbnailUrl,
+      status: post.status,
+      featured: post.featured || false,
+      publishedAt: post.publishedAt,
+      stats: {
+        views: post.viewsCount || 0,
+        likes: post.likesCount || 0,
+        comments: post.commentsCount || 0,
+        shares: post.bookmarksCount || 0,
+      },
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }))
+
+    return NextResponse.json({
+      blogs: formattedPosts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching blog posts:", error)
+    return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 })
+  }
 }
 
+// POST /api/blogs - Create new blog post
 export async function POST(request: Request) {
-  const body = await request.json()
-  const newBlog: Blog = {
-    _id: `blog-${Date.now()}`,
-    ...body,
-    stats: { views: 0, likes: 0, comments: 0, shares: 0 },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+  try {
+    const body = await request.json()
+    const { db } = await connectToDatabase()
+
+    const slug = body.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+
+    const newPost = {
+      title: body.title,
+      slug: `${slug}-${Date.now()}`,
+      summary: body.summary || "",
+      content: body.content || "",
+      tags: body.tags || [],
+      thumbnailUrl: body.thumbnailUrl || null,
+      author: {
+        name: body.authorName || "Admin",
+        role: "admin",
+        avatar: null,
+      },
+      featured: body.featured || false,
+      period: "monthly",
+      periodKey: new Date().toISOString().slice(0, 7),
+      likesCount: 0,
+      bookmarksCount: 0,
+      commentsCount: 0,
+      viewsCount: 0,
+      publishedAt: body.status === "published" ? new Date().toISOString() : null,
+      status: body.status || "draft",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    const result = await db.collection("posts").insertOne(newPost)
+
+    return NextResponse.json({
+      blog: { ...newPost, _id: result.insertedId.toString() },
+      message: "Blog post created successfully",
+    })
+  } catch (error) {
+    console.error("Error creating blog post:", error)
+    return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 })
   }
-  return NextResponse.json({ blog: newBlog, message: "Blog created successfully" })
 }
