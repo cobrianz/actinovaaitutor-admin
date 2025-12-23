@@ -11,11 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits").regex(/^\d+$/, "Phone number must contain only digits"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
   secretKey1: z.string().min(1, "Secret key 1 is required"),
@@ -28,6 +29,7 @@ const signupSchema = z.object({
 type SignupForm = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -48,9 +50,7 @@ export default function SignupPage() {
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
 
@@ -60,7 +60,10 @@ export default function SignupPage() {
         throw new Error(result.error || "Signup failed")
       }
 
-      setSuccess("Signup successful! Please check your email for verification code.")
+      setSuccess("Signup successful! Redirecting to verification...")
+      setTimeout(() => {
+        router.push(`/admin/auth/verify?email=${encodeURIComponent(data.email)}`)
+      }, 1500)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
@@ -69,102 +72,62 @@ export default function SignupPage() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Admin Signup</CardTitle>
-        <CardDescription>Create your admin account</CardDescription>
+    <Card className="w-full max-w-2xl">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Create Admin Account</CardTitle>
+        <CardDescription>Enter your details to register as an administrator</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Enter your name"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
-            )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Section 1: Personal Info */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" placeholder="John Doe" {...register("name")} />
+                {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="john@example.com" {...register("email")} />
+                {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" type="tel" placeholder="+1234567890" {...register("phone")} />
+                {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
+              </div>
+            </div>
+
+            {/* Section 2: Security */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" placeholder="********" {...register("password")} />
+                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input id="confirmPassword" type="password" placeholder="********" {...register("confirmPassword")} />
+                {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="Enter your phone number"
-              {...register("phone")}
-            />
-            {errors.phone && (
-              <p className="text-sm text-red-500">{errors.phone.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              {...register("confirmPassword")}
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="secretKey1">Secret Key 1</Label>
-            <Input
-              id="secretKey1"
-              type="password"
-              placeholder="Enter secret key 1"
-              {...register("secretKey1")}
-            />
-            {errors.secretKey1 && (
-              <p className="text-sm text-red-500">{errors.secretKey1.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="secretKey2">Secret Key 2</Label>
-            <Input
-              id="secretKey2"
-              type="password"
-              placeholder="Enter secret key 2"
-              {...register("secretKey2")}
-            />
-            {errors.secretKey2 && (
-              <p className="text-sm text-red-500">{errors.secretKey2.message}</p>
-            )}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="secretKey1">Secret Key 1</Label>
+              <Input id="secretKey1" type="password" placeholder="Key 1" {...register("secretKey1")} />
+              {errors.secretKey1 && <p className="text-sm text-red-500">{errors.secretKey1.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="secretKey2">Secret Key 2</Label>
+              <Input id="secretKey2" type="password" placeholder="Key 2" {...register("secretKey2")} />
+              {errors.secretKey2 && <p className="text-sm text-red-500">{errors.secretKey2.message}</p>}
+            </div>
           </div>
 
           {error && (
@@ -174,18 +137,18 @@ export default function SignupPage() {
           )}
 
           {success && (
-            <Alert>
+            <Alert className="border-green-500 text-green-600 bg-green-50">
               <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign Up
+            Register Account
           </Button>
         </form>
 
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-6 text-center text-sm">
           Already have an account?{" "}
           <Link href="/admin/auth/login" className="text-primary hover:underline">
             Login

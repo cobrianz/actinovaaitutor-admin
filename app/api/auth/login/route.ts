@@ -3,22 +3,22 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { getCollection } from "@/lib/mongodb"
 
-const ADMIN_SECRET_KEY_1 = process.env.ADMIN_SECRET_KEY_1!
-const ADMIN_SECRET_KEY_2 = process.env.ADMIN_SECRET_KEY_2!
-const JWT_SECRET = process.env.JWT_SECRET!
+const ADMIN_SECRET_KEY_1 = process.env.ADMIN_SECRET_KEY_1 || "key1"
+const ADMIN_SECRET_KEY_2 = process.env.ADMIN_SECRET_KEY_2 || "key2"
+const JWT_SECRET = process.env.JWT_SECRET || "default_jwt_secret_change_me"
 
 export async function POST(request: NextRequest) {
     try {
-        const { emailOrPhone, password, secretKey1, secretKey2 } = await request.json()
+        const { emailOrPhone, password, secretKey2 } = await request.json()
 
         // Validate required fields
-        if (!emailOrPhone || !password || !secretKey1 || !secretKey2) {
+        if (!emailOrPhone || !password || !secretKey2) {
             return NextResponse.json({ error: "All fields are required" }, { status: 400 })
         }
 
-        // Validate secret keys
-        if (secretKey1 !== ADMIN_SECRET_KEY_1 || secretKey2 !== ADMIN_SECRET_KEY_2) {
-            return NextResponse.json({ error: "Invalid secret keys" }, { status: 400 })
+        // Validate secret key
+        if (secretKey2 !== ADMIN_SECRET_KEY_2) {
+            return NextResponse.json({ error: "Invalid secret key" }, { status: 400 })
         }
 
         // Find admin by email or phone
@@ -34,6 +34,11 @@ export async function POST(request: NextRequest) {
         // Check if admin is verified
         if (!admin.isVerified) {
             return NextResponse.json({ error: "Account not verified. Please verify your email first." }, { status: 401 })
+        }
+
+        // Check if admin is approved
+        if (!admin.isApproved) {
+            return NextResponse.json({ error: "Account pending approval. Please contact an administrator." }, { status: 403 })
         }
 
         // Verify password
@@ -59,7 +64,7 @@ export async function POST(request: NextRequest) {
             { $set: { updatedAt: new Date().toISOString() } }
         )
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             message: "Login successful",
             token,
             admin: {
@@ -69,6 +74,19 @@ export async function POST(request: NextRequest) {
                 phone: admin.phone,
             }
         })
+
+        // Set HTTP-only cookie
+        response.cookies.set({
+            name: 'adminToken',
+            value: token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: '/',
+        })
+
+        return response
     } catch (error) {
         console.error("Login error:", error)
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })

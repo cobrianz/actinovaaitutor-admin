@@ -1,7 +1,9 @@
 "use client"
 
-import { Bell, Search, Settings, ChevronLeft,
-  ChevronRight, User, Menu, Moon, Sun, Monitor, Megaphone } from "lucide-react"
+import {
+  Bell, Search, Settings, ChevronLeft,
+  ChevronRight, User, Menu, Moon, Sun, Monitor, Megaphone
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -102,9 +104,6 @@ export function Navbar() {
           <NotificationsPanel>
             <Button variant="ghost" size="icon" className="relative" title="Notifications" suppressHydrationWarning>
               <Bell className="h-5 w-5" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-500">
-                3
-              </Badge>
             </Button>
           </NotificationsPanel>
 
@@ -141,10 +140,16 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
-                onClick={() => {
-                  // Handle logout logic here
-                  toast.success("Logged out successfully")
-                  router.push('/login')
+                onClick={async () => {
+                  try {
+                    await fetch('/api/auth/logout', { method: 'POST' })
+                    localStorage.removeItem('adminToken')
+                    localStorage.removeItem('adminUser')
+                    toast.success("Logged out successfully")
+                    router.push('/admin/auth/login')
+                  } catch (error) {
+                    toast.error("Logout failed")
+                  }
                 }}
               >
                 Log out

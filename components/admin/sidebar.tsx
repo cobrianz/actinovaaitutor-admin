@@ -15,14 +15,12 @@ import {
   FileBarChart,
   Settings,
   DollarSign,
-  ChevronLeft,
-  ChevronRight,
   User,
   LogOut,
+  Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/admin/sidebar-context"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const navigation = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
+  { name: "Admins", href: "/admin/admins", icon: Shield },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Courses", href: "/admin/courses", icon: BookOpen },
   { name: "Flashcards", href: "/admin/flashcards", icon: CreditCard },
@@ -48,11 +47,23 @@ const navigation = [
 ]
 
 export function Sidebar() {
-  const { collapsed, toggleCollapsed, mobileOpen, setMobileOpen } = useSidebar()
+  const { collapsed } = useSidebar()
   const pathname = usePathname()
   const [unreadContacts, setUnreadContacts] = useState(0)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
 
   useEffect(() => {
+    // Load user
+    const storedUser = localStorage.getItem("adminUser")
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (e) {
+        console.error("Failed to parse user", e)
+      }
+    }
+
+    // Load unread contacts
     const fetchUnreadCount = async () => {
       try {
         const response = await fetch('/api/contacts?status=new&limit=1')
@@ -61,30 +72,36 @@ export function Sidebar() {
           setUnreadContacts(data.pagination.total)
         }
       } catch (error) {
-        console.error("Failed to fetch unread contacts", error)
+        // console.error("Failed to fetch unread contacts", error)
       }
     }
 
     fetchUnreadCount()
-    // Poll every minute
     const interval = setInterval(fetchUnreadCount, 60000)
     return () => clearInterval(interval)
   }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      localStorage.removeItem('adminToken')
+      localStorage.removeItem('adminUser')
+      window.location.href = '/admin/auth/login'
+    } catch (error) {
+      console.error("Logout failed", error)
+    }
+  }
 
   return (
     <aside
       className={cn(
         "fixed left-0 top-16 z-40 flex flex-col border-r border-border glass-strong transition-all duration-300",
-        // On small screens: overlay/drawer behavior
         "lg:relative lg:top-0 lg:mt-16 lg:z-auto",
-        // Visibility and positioning
-        "hidden lg:flex", // Hide by default on small screens, show on large
+        "hidden lg:flex",
         collapsed ? "w-20" : "w-64",
-        // Mobile overlay when visible
         "sm:max-w-sm"
       )}
     >
-
       {/* Navigation */}
       <nav className="flex-1 space-y-3 px-3 py-6 overflow-y-auto">
         {navigation.map((item) => {
@@ -138,12 +155,14 @@ export function Sidebar() {
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback className="gradient-primary text-white">AD</AvatarFallback>
+                <AvatarFallback className="gradient-primary text-white">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
+                </AvatarFallback>
               </Avatar>
               {!collapsed && (
-                <div className="flex flex-col items-start text-left">
-                  <span className="font-medium">Admin User</span>
-                  <span className="text-xs text-foreground-muted">admin@actinova.ai</span>
+                <div className="flex flex-col items-start text-left overflow-hidden">
+                  <span className="font-medium truncate w-full">{user?.name || "Admin User"}</span>
+                  <span className="text-xs text-foreground-muted truncate w-full">{user?.email || "admin@actinova.ai"}</span>
                 </div>
               )}
             </button>
@@ -151,16 +170,20 @@ export function Sidebar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/profile" className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive cursor-pointer" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>

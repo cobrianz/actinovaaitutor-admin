@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import {
   Area,
   AreaChart,
   Line,
   LineChart,
+  Bar,
+  BarChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -14,195 +17,253 @@ import {
   XAxis,
   YAxis,
   Cell,
+  Legend,
 } from "recharts"
-import { Loader2 } from "lucide-react"
+import { Loader2, RefreshCw } from "lucide-react"
 
-const COLORS = {
-  primary: "var(--color-chart-1)",
-  secondary: "var(--color-chart-2)",
-  tertiary: "var(--color-chart-3)",
-  quaternary: "var(--color-chart-4)",
-  quinary: "var(--color-chart-5)",
-}
+const COLORS = ["#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"]
 
-interface DashboardChartsProps {
-  data: any
-  loading: boolean
-}
+export function DashboardCharts() {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-export function DashboardCharts({ data, loading }: DashboardChartsProps) {
+  const fetchAnalytics = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true)
+      const response = await fetch("/api/dashboard/analytics", { cache: "no-store" })
+      const result = await response.json()
+      if (result) {
+        setData(result)
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard analytics:", error)
+    } finally {
+      if (!silent) setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAnalytics()
+  }, [])
 
   if (loading) {
     return (
-      <div className="grid gap-6 md:grid-cols-2">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="glass border-border/50 h-[400px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
-          </Card>
-        ))}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Analytics Trends</h2>
+          <Button variant="outline" size="sm" disabled>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="glass-card border-border/50 h-[400px] flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+            </Card>
+          ))}
+        </div>
       </div>
     )
   }
 
   if (!data) return null
 
+  const trends = data.trends || {}
+  const metrics = data.metrics || {}
+
+  // Prepare user growth data
+  const userGrowthData = trends.userGrowth || []
+
+  // Prepare subscription distribution data
+  const subscriptionData = (trends.subscriptionDistribution || []).map((item: any) => ({
+    name: item.plan || "Free",
+    value: item.count,
+  }))
+
+  // Prepare content creation data
+  const contentData = trends.contentCreation || []
+
+  // Prepare engagement data
+  const engagementData = trends.engagement || []
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {/* User Growth Chart */}
-      <Card className="glass-blue border-border/50">
-        <CardHeader>
-          <CardTitle>User Growth</CardTitle>
-          <CardDescription>Daily new registrations over the last 30 days</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.userGrowth?.length > 0 ? (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Analytics Trends</h2>
+          <p className="text-sm text-foreground-muted">Visual insights and patterns</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fetchAnalytics(true)}
+          className="gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </Button>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* User Growth Trend */}
+        <Card className="glass-card border-border/50">
+          <CardHeader>
+            <CardTitle>User Growth (Last 30 Days)</CardTitle>
+            <CardDescription>New user registrations over time</CardDescription>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.userGrowth}>
+              <AreaChart data={userGrowthData}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <XAxis
                   dataKey="date"
-                  stroke="var(--color-muted-foreground)"
+                  stroke="#888888"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => value.split("-").slice(1).join("/")}
                 />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px'
                   }}
                 />
-                <Line type="monotone" dataKey="users" stroke={COLORS.primary} strokeWidth={2} dot={false} />
-              </LineChart>
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#8b5cf6"
+                  fillOpacity={1}
+                  fill="url(#colorUsers)"
+                />
+              </AreaChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No user growth data available
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Revenue Distribution Chart */}
-      <Card className="glass-purple border-border/50">
-        <CardHeader>
-          <CardTitle>Revenue Distribution</CardTitle>
-          <CardDescription>Revenue breakdown by subscription plans</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.revenueDistribution?.length > 0 ? (
+        {/* Subscription Distribution */}
+        <Card className="glass-card border-border/50">
+          <CardHeader>
+            <CardTitle>Subscription Distribution</CardTitle>
+            <CardDescription>Users by subscription plan</CardDescription>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={data.revenueDistribution}
+                  data={subscriptionData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
-                  fill={COLORS.primary}
+                  fill="#8884d8"
                   dataKey="value"
                 >
-                  {data.revenueDistribution.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % 5]} />
+                  {subscriptionData.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px'
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No revenue data available
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Activity Heatmap */}
-      <Card className="glass-blue border-border/50">
-        <CardHeader>
-          <CardTitle>Activity Heatmap</CardTitle>
-          <CardDescription>Daily active users by hour of day</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.activityData && data.activityData.some((d: any) => d.users > 0) ? (
+        {/* Content Creation Trend */}
+        <Card className="glass-card border-border/50">
+          <CardHeader>
+            <CardTitle>Content Creation (Last 30 Days)</CardTitle>
+            <CardDescription>Blog posts published over time</CardDescription>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={data.activityData}>
-                <defs>
-                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <BarChart data={contentData}>
                 <XAxis
-                  dataKey="hour"
-                  stroke="var(--color-muted-foreground)"
+                  dataKey="date"
+                  stroke="#888888"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px'
                   }}
                 />
-                <Area type="monotone" dataKey="users" stroke={COLORS.secondary} fillOpacity={1} fill="url(#colorUsers)" />
-              </AreaChart>
+                <Bar dataKey="posts" fill="#06b6d4" radius={[8, 8, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No activity data available for today
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Content Generation Trends */}
-      <Card className="glass-purple border-border/50">
-        <CardHeader>
-          <CardTitle>Content Generation</CardTitle>
-          <CardDescription>AI-generated courses and library additions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.generationTrends?.length > 0 ? (
+        {/* Engagement Trend */}
+        <Card className="glass-card border-border/50">
+          <CardHeader>
+            <CardTitle>User Engagement (Last 30 Days)</CardTitle>
+            <CardDescription>Interactions and activity over time</CardDescription>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.generationTrends}>
+              <LineChart data={engagementData}>
                 <XAxis
-                  dataKey="month"
-                  stroke="var(--color-muted-foreground)"
+                  dataKey="date"
+                  stroke="#888888"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px'
                   }}
                 />
-                <Line type="monotone" dataKey="courses" stroke={COLORS.tertiary} strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={{ fill: '#10b981' }}
+                />
               </LineChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No content generation data available
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

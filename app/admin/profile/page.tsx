@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useEffect } from "react"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +15,75 @@ import { User, Mail, Phone, MapPin, Lock, Bell, Shield, Activity } from "lucide-
 import { toast } from "sonner"
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("/api/profile", { cache: "no-store" })
+      const data = await response.json()
+      if (data.profile) {
+        setProfile(data.profile)
+      }
+    } catch (error) {
+      console.error("Failed to fetch profile:", error)
+      toast.error("Failed to load profile")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProfile()
+  }, [])
+
+  const handleSave = async () => {
+    try {
+      setSaving(true)
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success("Profile updated successfully")
+        setProfile(data.profile)
+      } else {
+        toast.error("Failed to update profile")
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error)
+      toast.error("Failed to update profile")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateField = (field: string, value: string | boolean) => {
+    setProfile((prev: any) => ({ ...prev, [field]: value }))
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!profile) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-foreground-muted">Profile not found</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -28,7 +99,9 @@ export default function ProfilePage() {
             <div className="relative">
               <Avatar className="h-24 w-24">
                 <AvatarImage src="/placeholder.svg?height=96&width=96" />
-                <AvatarFallback className="gradient-primary text-white text-3xl">AD</AvatarFallback>
+                <AvatarFallback className="gradient-primary text-white text-3xl">
+                  {profile.name ? profile.name.charAt(0).toUpperCase() : "A"}
+                </AvatarFallback>
               </Avatar>
               <Button
                 size="sm"
@@ -39,8 +112,8 @@ export default function ProfilePage() {
               </Button>
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">Admin User</h2>
-              <p className="text-foreground-muted">admin@actinova.ai</p>
+              <h2 className="text-2xl font-bold">{profile.name}</h2>
+              <p className="text-foreground-muted">{profile.email}</p>
               <div className="flex gap-2 mt-3">
                 <Badge className="gradient-primary">Super Admin</Badge>
                 <Badge variant="outline">Active</Badge>
@@ -48,9 +121,13 @@ export default function ProfilePage() {
             </div>
             <div className="text-right space-y-1">
               <p className="text-sm text-foreground-muted">Member Since</p>
-              <p className="font-semibold">Jan 15, 2024</p>
-              <p className="text-sm text-foreground-muted">Last Login</p>
-              <p className="font-semibold">2 hours ago</p>
+              <p className="font-semibold">
+                {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}
+              </p>
+              <p className="text-sm text-foreground-muted">Last Update</p>
+              <p className="font-semibold">
+                {profile.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : 'N/A'}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -75,25 +152,26 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" defaultValue="Admin" className="glass border-border/50" />
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={profile.name || ''}
+                    onChange={(e) => updateField('name', e.target.value)}
+                    className="glass border-border/50"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" defaultValue="User" className="glass border-border/50" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-                  <Input
-                    id="email"
-                    type="email"
-                    defaultValue="admin@actinova.ai"
-                    className="pl-10 glass border-border/50"
-                  />
+                  <Label htmlFor="email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profile.email || ''}
+                      onChange={(e) => updateField('email', e.target.value)}
+                      className="pl-10 glass border-border/50"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -104,19 +182,13 @@ export default function ProfilePage() {
                   <Input
                     id="phone"
                     type="tel"
-                    defaultValue="+1 (555) 123-4567"
+                    value={profile.phone || ''}
+                    onChange={(e) => updateField('phone', e.target.value)}
                     className="pl-10 glass border-border/50"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-                  <Input id="location" defaultValue="San Francisco, CA" className="pl-10 glass border-border/50" />
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="bio">Bio</Label>
@@ -124,12 +196,13 @@ export default function ProfilePage() {
                   id="bio"
                   placeholder="Tell us about yourself..."
                   className="min-h-[100px] glass border-border/50"
-                  defaultValue="Passionate about education technology and AI-driven learning solutions."
+                  value={profile.bio || ''}
+                  onChange={(e) => updateField('bio', e.target.value)}
                 />
               </div>
 
-              <Button onClick={() => toast.success("Profile updated successfully")} className="gradient-primary">
-                Save Changes
+              <Button onClick={handleSave} disabled={saving} className="gradient-primary">
+                {saving ? "Saving..." : "Save Changes"}
               </Button>
             </CardContent>
           </Card>
@@ -201,25 +274,32 @@ export default function ProfilePage() {
               <CardDescription>Manage how you receive notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {[
-                { label: "Email Notifications", desc: "Receive notifications via email" },
-                { label: "Push Notifications", desc: "Receive push notifications in browser" },
-                { label: "New User Registrations", desc: "Alert when new users sign up" },
-                { label: "Course Completions", desc: "Notify when users complete courses" },
-                { label: "Payment Alerts", desc: "Alert on new payments and transactions" },
-                { label: "System Updates", desc: "Important system and security updates" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-lg glass-subtle">
-                  <div className="flex items-center gap-3">
-                    <Bell className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-sm text-foreground-muted">{item.desc}</p>
-                    </div>
+              <div className="flex items-center justify-between p-4 rounded-lg glass-subtle">
+                <div className="flex items-center gap-3">
+                  <Bell className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Email Notifications</p>
+                    <p className="text-sm text-foreground-muted">Receive notifications via email</p>
                   </div>
-                  <Switch defaultChecked={i < 3} />
                 </div>
-              ))}
+                <Switch
+                  checked={profile?.emailNotifications ?? true}
+                  onCheckedChange={(c) => updateField('emailNotifications', c)}
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 rounded-lg glass-subtle">
+                <div className="flex items-center gap-3">
+                  <Bell className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Push Notifications</p>
+                    <p className="text-sm text-foreground-muted">Receive push notifications in browser</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={profile?.pushNotifications ?? false}
+                  onCheckedChange={(c) => updateField('pushNotifications', c)}
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -229,60 +309,28 @@ export default function ProfilePage() {
           <Card className="glass border-border/50">
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your recent actions and login history</CardDescription>
+              <CardDescription>Your recent account activity</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {[
-                  { action: "Updated user profile", time: "2 hours ago" },
-                  { action: "Created new course", time: "5 hours ago" },
-                  { action: "Responded to contact", time: "1 day ago" },
-                  { action: "Generated analytics report", time: "2 days ago" },
-                  { action: "Modified subscription plan", time: "3 days ago" },
-                  { action: "Logged in from new device", time: "5 days ago" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg glass-subtle">
-                    <Activity className="h-5 w-5 text-primary flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium">{item.action}</p>
-                      <p className="text-sm text-foreground-muted">{item.time}</p>
-                    </div>
+                <div className="flex items-center gap-3 p-3 rounded-lg glass-subtle">
+                  <Activity className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-medium">Last Login</p>
+                    <p className="text-sm text-foreground-muted">
+                      {profile?.updatedAt ? new Date(profile.updatedAt).toLocaleString() : 'N/A'}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass border-border/50">
-            <CardHeader>
-              <CardTitle>Login Sessions</CardTitle>
-              <CardDescription>Active sessions across devices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  { device: "Chrome on MacBook Pro", location: "San Francisco, CA", current: true },
-                  { device: "Safari on iPhone 13", location: "San Francisco, CA", current: false },
-                ].map((session, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-lg glass-subtle">
-                    <div>
-                      <p className="font-medium">{session.device}</p>
-                      <p className="text-sm text-foreground-muted">{session.location}</p>
-                    </div>
-                    {session.current ? (
-                      <Badge variant="default">Current</Badge>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toast.success("Session terminated")}
-                        className="glass border-border/50"
-                      >
-                        Revoke
-                      </Button>
-                    )}
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-lg glass-subtle">
+                  <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-medium">Account Created</p>
+                    <p className="text-sm text-foreground-muted">
+                      {profile?.createdAt ? new Date(profile.createdAt).toLocaleString() : 'N/A'}
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
             </CardContent>
           </Card>

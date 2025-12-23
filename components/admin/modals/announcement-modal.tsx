@@ -17,7 +17,7 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { Send, Megaphone, Users, Clock, AlertCircle } from "lucide-react"
+import { Send, Megaphone, Users, Clock, AlertCircle, Loader2 } from "lucide-react"
 
 interface AnnouncementModalProps {
   isOpen: boolean
@@ -38,28 +38,46 @@ export function AnnouncementModal({ isOpen, onClose }: AnnouncementModalProps) {
     sendPush: false,
   })
 
-  const handleSend = () => {
+  const [sending, setSending] = useState(false)
+
+  const handleSend = async () => {
     if (!announcement.title.trim() || !announcement.message.trim()) {
       toast.error('Please fill in both title and message')
       return
     }
 
-    toast.success('Announcement sent successfully!')
-    onClose()
+    try {
+      setSending(true)
+      const response = await fetch('/api/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(announcement)
+      })
 
-    // Reset form
-    setAnnouncement({
-      title: '',
-      message: '',
-      type: 'info',
-      targetAudience: 'all',
-      priority: 'normal',
-      scheduled: false,
-      scheduleDate: '',
-      scheduleTime: '',
-      sendEmail: true,
-      sendPush: false,
-    })
+      if (!response.ok) throw new Error('Failed to send announcement')
+
+      toast.success('Announcement sent successfully!')
+      onClose()
+
+      // Reset form
+      setAnnouncement({
+        title: '',
+        message: '',
+        type: 'info',
+        targetAudience: 'all',
+        priority: 'normal',
+        scheduled: false,
+        scheduleDate: '',
+        scheduleTime: '',
+        sendEmail: true,
+        sendPush: false,
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to send announcement')
+    } finally {
+      setSending(false)
+    }
   }
 
   const updateField = (field: string, value: any) => {
@@ -299,11 +317,15 @@ export function AnnouncementModal({ isOpen, onClose }: AnnouncementModalProps) {
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={sending}>
             Cancel
           </Button>
-          <Button onClick={handleSend} className="gradient-primary">
-            <Send className="h-4 w-4 mr-2" />
+          <Button onClick={handleSend} disabled={sending} className="gradient-primary">
+            {sending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4 mr-2" />
+            )}
             {announcement.scheduled ? 'Schedule Announcement' : 'Send Now'}
           </Button>
         </div>

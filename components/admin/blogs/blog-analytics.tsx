@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import {
   Area,
   AreaChart,
@@ -15,7 +16,7 @@ import {
   YAxis,
   Cell,
 } from "recharts"
-import { Loader2 } from "lucide-react"
+import { Loader2, RefreshCw } from "lucide-react"
 
 const COLORS = {
   primary: "var(--color-chart-1)",
@@ -33,41 +34,42 @@ export function BlogAnalytics() {
     publishingFrequency: [],
   })
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        setLoading(true)
-        // 1. Fetch real-time trends and distributions
-        const analyticsRes = await fetch("/api/blogs/analytics")
-        const analyticsData = await analyticsRes.json()
+  const fetchAnalytics = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true)
+      // 1. Fetch real-time trends and distributions
+      const analyticsRes = await fetch("/api/blogs/analytics", { cache: "no-store" })
+      const analyticsData = await analyticsRes.json()
 
-        // 2. Fetch all blogs for global totals (views, likes, comments)
-        const blogRes = await fetch("/api/blogs?limit=100")
-        const blogData = await blogRes.json()
-        const blogs = blogData.blogs || []
+      // 2. Fetch all blogs for global totals (views, likes, comments)
+      const blogRes = await fetch("/api/blogs?limit=100", { cache: "no-store" })
+      const blogData = await blogRes.json()
+      const blogs = blogData.blogs || []
 
-        // 3. Global Metrics
-        const totalViews = blogs.reduce((acc: number, b: any) => acc + (b.stats?.views || 0), 0)
-        const totalLikes = blogs.reduce((acc: number, b: any) => acc + (b.stats?.likes || 0), 0)
-        const totalComments = blogs.reduce((acc: number, b: any) => acc + (b.stats?.comments || 0), 0)
-        const avgEngagement = totalViews ? ((totalLikes / totalViews) * 100).toFixed(1) : 0
+      // 3. Global Metrics
+      const totalViews = blogs.reduce((acc: number, b: any) => acc + (b.stats?.views || 0), 0)
+      const totalLikes = blogs.reduce((acc: number, b: any) => acc + (b.stats?.likes || 0), 0)
+      const totalComments = blogs.reduce((acc: number, b: any) => acc + (b.stats?.comments || 0), 0)
+      const avgEngagement = totalViews ? ((totalLikes / totalViews) * 100).toFixed(1) : 0
 
-        setData({
-          categories: analyticsData.categories || [],
-          engagementTrends: analyticsData.engagementTrends || [],
-          publishingFrequency: analyticsData.publishingFrequency || [],
-          totalViews,
-          totalLikes,
-          totalComments,
-          avgEngagement,
-          postCount: blogs.length
-        })
-      } catch (error) {
-        console.error("Failed to fetch blog analytics:", error)
-      } finally {
-        setLoading(false)
-      }
+      setData({
+        categories: analyticsData.categories || [],
+        engagementTrends: analyticsData.engagementTrends || [],
+        publishingFrequency: analyticsData.publishingFrequency || [],
+        totalViews,
+        totalLikes,
+        totalComments,
+        avgEngagement,
+        postCount: blogs.length
+      })
+    } catch (error) {
+      console.error("Failed to fetch blog analytics:", error)
+    } finally {
+      if (!silent) setLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchAnalytics()
   }, [])
 
