@@ -30,6 +30,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 
 const navigation = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -46,7 +52,45 @@ const navigation = [
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
+export function SidebarDesktop() {
+  const { collapsed } = useSidebar()
+
+  return (
+    <aside
+      className={cn(
+        "fixed left-0 top-16 z-40 flex flex-col border-r border-border glass-strong transition-all duration-300",
+        "lg:relative lg:top-0 lg:mt-16 lg:z-auto",
+        "hidden lg:flex",
+        collapsed ? "w-20" : "w-64",
+        "sm:max-w-sm"
+      )}
+    >
+      <SidebarContent />
+    </aside>
+  )
+}
+
 export function Sidebar() {
+  const { mobileOpen, setMobileOpen } = useSidebar()
+
+  return (
+    <>
+      <SidebarDesktop />
+      <Sheet open={mobileOpen} onOpenChange={setOpen => setMobileOpen(setOpen)}>
+        <SheetContent side="left" className="p-0 bg-white dark:bg-zinc-950 w-72">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col h-full pt-16">
+            <SidebarContent onItemClick={() => setMobileOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  )
+}
+
+function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
   const { collapsed } = useSidebar()
   const pathname = usePathname()
   const [unreadContacts, setUnreadContacts] = useState(0)
@@ -93,15 +137,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-16 z-40 flex flex-col border-r border-border glass-strong transition-all duration-300",
-        "lg:relative lg:top-0 lg:mt-16 lg:z-auto",
-        "hidden lg:flex",
-        collapsed ? "w-20" : "w-64",
-        "sm:max-w-sm"
-      )}
-    >
+    <div className="flex flex-col h-full">
       {/* Navigation */}
       <nav className="flex-1 space-y-3 px-3 py-6 overflow-y-auto">
         {navigation.map((item) => {
@@ -110,6 +146,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => onItemClick?.()}
               className={cn(
                 "flex items-center gap-4 rounded-lg px-3 py-2 text-[14px] font-medium transition-all text-gray-500",
                 isActive
@@ -127,7 +164,7 @@ export function Sidebar() {
                   </span>
                 )}
               </div>
-              {!collapsed && (
+              {(!collapsed || typeof window !== 'undefined' && window.innerWidth < 1024) && (
                 <div className="flex flex-1 items-center justify-between">
                   <span>{item.name}</span>
                   {item.name === "Contacts" && unreadContacts > 0 && (
@@ -159,7 +196,7 @@ export function Sidebar() {
                   {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
                 </AvatarFallback>
               </Avatar>
-              {!collapsed && (
+              {(!collapsed || typeof window !== 'undefined' && window.innerWidth < 1024) && (
                 <div className="flex flex-col items-start text-left overflow-hidden">
                   <span className="font-medium truncate w-full">{user?.name || "Admin User"}</span>
                   <span className="text-xs text-foreground-muted truncate w-full">{user?.email || "admin@actinova.ai"}</span>
@@ -190,6 +227,6 @@ export function Sidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </aside>
+    </div>
   )
 }

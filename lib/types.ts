@@ -52,7 +52,19 @@ export interface User {
     totalChats?: number
     totalNotes?: number
     totalFlashcards?: number
+    coursesEnrolled?: number
+    coursesCompleted?: number
+    totalStudyTime?: number
+    totalTests?: number
+    totalInteractions?: number
   }
+  courses?: {
+    courseId: string
+    progress: number
+    status: "enrolled" | "completed" | "dropped"
+    startedAt: string
+    lastUpdated: string
+  }[]
   joinedDate: string
   createdAt: string
   updatedAt: string

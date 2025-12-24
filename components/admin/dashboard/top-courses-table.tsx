@@ -45,9 +45,9 @@ export function TopCoursesTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Course Title</TableHead>
-                <TableHead className="text-right">Difficulty</TableHead>
-                <TableHead className="text-right">Category</TableHead>
+                <TableHead>Course</TableHead>
+                <TableHead className="hidden lg:table-cell text-right">Difficulty</TableHead>
+                <TableHead className="hidden md:table-cell text-right">Category</TableHead>
                 <TableHead className="text-right">Rating</TableHead>
               </TableRow>
             </TableHeader>
@@ -55,11 +55,16 @@ export function TopCoursesTable() {
               {courses.length > 0 ? (
                 courses.map((course) => (
                   <TableRow key={course._id}>
-                    <TableCell className="font-medium truncate max-w-[200px]">{course.title}</TableCell>
-                    <TableCell className="text-right text-foreground-muted">
+                    <TableCell className="py-4">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">{course.title}</span>
+                        <span className="text-xs text-foreground-muted sm:hidden truncate">{course.category}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-right text-foreground-muted">
                       {course.difficulty}
                     </TableCell>
-                    <TableCell className="text-right text-foreground-muted">
+                    <TableCell className="hidden md:table-cell text-right text-foreground-muted truncate max-w-[100px]">
                       {course.category}
                     </TableCell>
                     <TableCell className="text-right">

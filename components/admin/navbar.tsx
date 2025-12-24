@@ -27,7 +27,7 @@ import { AnnouncementModal } from "@/components/admin/modals/announcement-modal"
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
-  const { collapsed, toggleCollapsed } = useSidebar()
+  const { collapsed, toggleCollapsed, toggleMobile } = useSidebar()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
@@ -66,7 +66,17 @@ export function Navbar() {
     <nav className="fixed w-full top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="flex h-16  items-center px-6">
         {/* Menu Toggle */}
-        <Button variant="ghost" size="icon" onClick={toggleCollapsed}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            if (window.innerWidth < 768) {
+              toggleMobile()
+            } else {
+              toggleCollapsed()
+            }
+          }}
+        >
           <Menu className="h-4 w-4" />
         </Button>
 

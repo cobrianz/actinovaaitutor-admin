@@ -42,22 +42,29 @@ export function RecentUsersTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden lg:table-cell">Joined</TableHead>
+                <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.length > 0 ? (
                 users.map((user) => (
                   <TableRow key={user._id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell className="text-foreground-muted">{user.email}</TableCell>
-                    <TableCell className="text-foreground-muted">
+                    <TableCell className="py-4">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium truncate">{user.name}</span>
+                        <span className="text-xs text-foreground-muted truncate md:hidden">{user.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-foreground-muted truncate max-w-[150px] lg:max-w-[200px]">
+                      {user.email}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-foreground-muted whitespace-nowrap">
                       {new Date(user.joinedDate).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <Badge
                         variant={user.status === "active" ? "default" : user.status === "pending" ? "secondary" : "outline"}
                       >

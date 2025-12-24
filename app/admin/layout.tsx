@@ -33,7 +33,7 @@ export default function AdminLayout({
         <Sidebar />
         <main className="flex-1 overflow-y-auto pt-16">
           <Navbar />
-          <div className="container mx-auto p-6 lg:p-8">{children}</div>
+          <div className="container mx-auto p-4 md:p-6 lg:p-8">{children}</div>
         </main>
         <Toaster richColors position="top-right" />
       </div>
